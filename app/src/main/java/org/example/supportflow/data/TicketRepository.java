@@ -62,4 +62,34 @@ public class TicketRepository {
                     cb.onSuccess(list);
                 });
     }
+
+    // Ticket por ID
+    public interface TicketCallback {
+        void onSuccess(Ticket ticket);
+        void onNotFound();
+        void onError(Exception e);
+    }
+
+    public void escucharTicketPorId(String ticketId, TicketCallback cb) {
+        db.collection("tickets")
+                .document(ticketId)
+                .addSnapshotListener((doc, e) -> {
+                    if (e != null) {
+                        cb.onError(e);
+                        return;
+                    }
+                    if (doc == null || !doc.exists()) {
+                        cb.onNotFound();
+                        return;
+                    }
+                    Ticket t = doc.toObject(Ticket.class);
+                    if (t != null) {
+                        t.setId(doc.getId());
+                        cb.onSuccess(t);
+                    } else {
+                        cb.onNotFound();
+                    }
+                });
+    }
+
 }

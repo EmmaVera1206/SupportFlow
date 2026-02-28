@@ -2,6 +2,7 @@ package org.example.supportflow.ui.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,7 @@ public class MisTicketsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mis_tickets);
+
 
         // Validar sesión
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -64,5 +66,13 @@ public class MisTicketsActivity extends AppCompatActivity {
         });
         rv.setAdapter(adapter);
 
+        Button btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(this, org.example.supportflow.ui.auth.LoginActivity.class));
+            finish();
+        });
+
     }
+
 }
