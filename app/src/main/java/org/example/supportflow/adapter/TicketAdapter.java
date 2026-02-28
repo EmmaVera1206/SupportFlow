@@ -17,7 +17,15 @@ import java.util.List;
 
 public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.VH> {
 
+    public interface OnTicketClickListener {
+        void onClick(Ticket ticket);
+    }
     private final List<Ticket> data = new ArrayList<>();
+    private final OnTicketClickListener listener;
+
+    public TicketAdapter(OnTicketClickListener listener) {
+        this.listener = listener;
+    }
 
     public void submit(List<Ticket> newData) {
         data.clear();
@@ -39,6 +47,11 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.VH> {
         h.tvCategory.setText("Categoría: " + t.getCategory());
         h.tvStatus.setText(t.getStatus());
         h.tvPriority.setText(t.getPriority());
+
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onClick(t);
+        });
+
     }
 
     @Override

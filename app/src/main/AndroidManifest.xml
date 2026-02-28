@@ -21,13 +21,19 @@
 <!--            </intent-filter> -->
         </activity>
 
-        <activity android:name=".ui.user.CrearTicketActivity"/>
-        <activity android:name=".ui.user.MisTicketsActivity"
+        <activity android:name=".ui.auth.RegisterActivity"/>
+        <activity android:name=".ui.auth.LoginActivity"/>
+        <activity
+            android:name=".ui.auth.RoleRouterActivity"
             android:exported="true">
         <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
+        </activity>
+        <activity android:name=".ui.user.CrearTicketActivity"/>
+        <activity android:name=".ui.user.MisTicketsActivity"
+            android:exported="true">
         </activity>
 
     </application>
