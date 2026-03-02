@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.example.supportflow.ui.tecnico.TecnicoAsignadosActivity;
 import org.example.supportflow.ui.user.MisTicketsActivity;
 
 public class RoleRouterActivity extends AppCompatActivity {
@@ -39,8 +41,20 @@ public class RoleRouterActivity extends AppCompatActivity {
                     String role = doc.getString("role");
                     if (role == null) role = "USER";
 
-                    // ✅ Por ahora todos pueden entrar a MisTickets, luego separas:
-                    Intent i = new Intent(this, MisTicketsActivity.class);
+                    Intent i;
+                    switch (role) {
+                        case "TECH":
+                            i = new Intent(this, TecnicoAsignadosActivity.class);
+                            break;
+                        case "ADMIN":
+                            // se manda a MisTicketsActivity por mientras
+                            i = new Intent(this, MisTicketsActivity.class);
+                            break;
+                        default:
+                            i = new Intent(this, MisTicketsActivity.class);
+                            break;
+                    }
+
                     i.putExtra("ROLE", role);
                     startActivity(i);
                     finish();

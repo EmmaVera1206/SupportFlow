@@ -20,6 +20,15 @@
             android:padding="20dp"
             android:gravity="center" />
 
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No tienes tickets asignados."
+            android:gravity="center"
+            android:padding="12dp"
+            android:visibility="gone"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvTicketsAsignados"
             android:layout_width="match_parent"
