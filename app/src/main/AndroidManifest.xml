@@ -54,6 +54,8 @@
         <activity
             android:name=".ui.AdminReportesActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".ui.AdminDetalleTicketActivity"
+            android:exported="false" />
     </application>
 </manifest>
