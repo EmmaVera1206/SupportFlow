@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.example.supportflow.ui.AdminTicketsActivity;
 import org.example.supportflow.ui.tecnico.TecnicoAsignadosActivity;
 import org.example.supportflow.ui.user.MisTicketsActivity;
 
@@ -47,8 +48,8 @@ public class RoleRouterActivity extends AppCompatActivity {
                             i = new Intent(this, TecnicoAsignadosActivity.class);
                             break;
                         case "ADMIN":
-                            // se manda a MisTicketsActivity por mientras
-                            i = new Intent(this, MisTicketsActivity.class);
+                            // ✅ Ahora manda al admin a su pantalla
+                            i = new Intent(this, AdminTicketsActivity.class);
                             break;
                         default:
                             i = new Intent(this, MisTicketsActivity.class);

@@ -46,5 +46,14 @@
             android:name=".ui.tecnico.TecnicoAsignadosActivity"
             android:exported="false" />
 
+        <!-- ✅ Pantallas de Admin -->
+        <activity
+            android:name=".ui.AdminTicketsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.AdminReportesActivity"
+            android:exported="false" />
+
     </application>
 </manifest>

@@ -38,12 +38,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(platform("com.google.firebase:firebase-bom:34.9.0"))
-
-    // Auth (login)
     implementation("com.google.firebase:firebase-auth")
-
-    // Firestore (tickets)
     implementation("com.google.firebase:firebase-firestore")
+
+    // ✅ Librería de gráficas
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

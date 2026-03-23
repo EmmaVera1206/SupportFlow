@@ -16,9 +16,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // ✅ Repositorio para MPAndroidChart
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "SupportFlow"
 include(":app")
- 
