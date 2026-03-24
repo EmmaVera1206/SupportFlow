@@ -1,4 +1,4 @@
-package org.example.supportflow.ui.admin;
+package org.example.supportflow.ui;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -7,13 +7,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import org.example.supportflow.R;
 import org.example.supportflow.adapter.AdminTicketAdapter;
 import org.example.supportflow.data.TicketRepository;
 import org.example.supportflow.model.Ticket;
-import org.example.supportflow.ui.auth.LoginActivity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,21 +53,10 @@ public class AdminTicketsActivity extends AppCompatActivity {
         }, false);
         rvAsignados.setAdapter(adapterAsignados);
 
-        // Botón regresar
-        findViewById(R.id.btnSalir).setOnClickListener(v -> finish());
-
-        // Botón reportes
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         findViewById(R.id.btnFilter).setOnClickListener(v ->
                 startActivity(new Intent(AdminTicketsActivity.this, AdminReportesActivity.class))
         );
-
-        // ✅ Botón cerrar sesión
-        findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(this, LoginActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-        });
 
         cargarTickets();
     }
