@@ -1,49 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#1A1A2E">
 
-    <LinearLayout
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:src="@android:drawable/ic_media_previous"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Regresar"
+            app:tint="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Crear Ticket"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+    </RelativeLayout>
+
+    <!-- Contenido -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="18dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#F2F2F2"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título de ticket:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111111"/>
+
+                <EditText
+                    android:id="@+id/etTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/edit_text"
+                    android:hint="Título"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="#111111"
+                    android:textColorHint="#999999"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="Descripción:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111111"/>
+
+                <EditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/edit_text"
+                    android:gravity="top|start"
+                    android:hint="Descripción del problema..."
+                    android:minLines="4"
+                    android:padding="12dp"
+                    android:textColor="#111111"
+                    android:textColorHint="#999999"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="Categoría:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111111"/>
+
+                <EditText
+                    android:id="@+id/etCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/edit_text"
+                    android:hint="Ej. Soporte Técnico"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="#111111"
+                    android:textColorHint="#999999"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="Prioridad:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#111111"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="¿Cuál es la prioridad de tu problema?"
+                    android:textSize="13sp"
+                    android:textColor="#777777"/>
+
+                <EditText
+                    android:id="@+id/etPriority"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/edit_text"
+                    android:hint="LOW / MEDIUM / HIGH / CRITICAL"
+                    android:paddingHorizontal="12dp"
+                    android:textAllCaps="true"
+                    android:textColor="#111111"
+                    android:textColorHint="#999999"/>
+
+                <Button
+                    android:id="@+id/btnCrear"
+                    android:layout_width="180dp"
+                    android:layout_height="52dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="#3F45B5"
+                    android:text="CREAR"
+                    android:textAllCaps="true"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="vertical">
-
-        <EditText
-            android:id="@+id/etTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Título del ticket"/>
-
-        <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Descripción"
-            android:minLines="3"
-            android:gravity="top"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:id="@+id/etCategory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Categoría (ej. Soporte Técnico)"
-            android:layout_marginTop="10dp"/>
-
-        <EditText
-            android:id="@+id/etPriority"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Prioridad (LOW/MEDIUM/HIGH/CRITICAL)"
-            android:layout_marginTop="10dp"/>
-
-        <Button
-            android:id="@+id/btnCrear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="CREAR"
-            android:layout_marginTop="16dp"/>
-
-    </LinearLayout>
-</ScrollView>
+        android:text="SupportFlow"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:paddingVertical="8dp"/>
+</LinearLayout>

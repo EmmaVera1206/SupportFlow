@@ -48,14 +48,14 @@
 
         <!-- ✅ Pantallas de Admin -->
         <activity
-            android:name=".ui.AdminTicketsActivity"
+            android:name=".ui.admin.AdminTicketsActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.AdminReportesActivity"
+            android:name=".ui.admin.AdminReportesActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.AdminDetalleTicketActivity"
+            android:name=".ui.admin.AdminDetalleTicketActivity"
             android:exported="false" />
     </application>
 </manifest>

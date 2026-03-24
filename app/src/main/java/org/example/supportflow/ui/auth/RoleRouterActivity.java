@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.example.supportflow.ui.AdminTicketsActivity;
+import org.example.supportflow.ui.admin.AdminTicketsActivity;
 import org.example.supportflow.ui.tecnico.TecnicoAsignadosActivity;
 import org.example.supportflow.ui.user.MisTicketsActivity;
 

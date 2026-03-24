@@ -38,6 +38,8 @@ public class CrearTicketActivity extends AppCompatActivity {
         EditText etPri   = findViewById(R.id.etPriority);
         Button btnCrear  = findViewById(R.id.btnCrear);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         // Acción crear
         btnCrear.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();

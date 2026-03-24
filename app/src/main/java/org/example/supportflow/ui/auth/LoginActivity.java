@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,12 +23,10 @@ public class LoginActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
         Button btnLogin = findViewById(R.id.btnLogin);
-
-
+        TextView tvRegistrate = findViewById(R.id.tvRegistrate);
 
         btnLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
@@ -38,14 +37,19 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // Lógica de Firebase
             auth.signInWithEmailAndPassword(email, pass)
                     .addOnSuccessListener(result -> {
-
                         startActivity(new Intent(this, RoleRouterActivity.class));
                         finish();
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+        });
+
+        // ✅ Botón ir a registro
+        tvRegistrate.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterActivity.class));
         });
     }
 }

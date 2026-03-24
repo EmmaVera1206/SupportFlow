@@ -66,6 +66,8 @@ public class DetalleTicketActivity extends AppCompatActivity {
         EditText etComment = findViewById(R.id.etComment);
         Button btnSend = findViewById(R.id.btnSendComment);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         // Escuchar cambios del ticket
         db.collection("tickets").document(ticketId)
                 .addSnapshotListener((doc, e) -> {

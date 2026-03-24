@@ -1,12 +1,14 @@
 package org.example.supportflow.ui.tecnico
 
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.example.supportflow.R
 import org.example.supportflow.model.Ticket
+
 
 class TecnicoDetalleActivity : AppCompatActivity() {
 
@@ -87,6 +89,8 @@ class TecnicoDetalleActivity : AppCompatActivity() {
             spinnerEstado.setSelection(2) // RESOLVED
             Toast.makeText(this, "Ticket marcado como resuelto ✅", Toast.LENGTH_SHORT).show()
         }
+
+        findViewById<View>(R.id.btnBackTecnicoDetalle).setOnClickListener { finish() }
 
         // Comentario técnico
         btnSendComment.setOnClickListener {
