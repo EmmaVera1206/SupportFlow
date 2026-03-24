@@ -1,10 +1,10 @@
-package org.example.supportflow.ui;
+package org.example.supportflow.ui.admin;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.TextView;
 import org.example.supportflow.R;
-import org.example.supportflow.model.Ticket;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

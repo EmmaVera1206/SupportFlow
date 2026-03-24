@@ -66,6 +66,8 @@ public class MisTicketsActivity extends AppCompatActivity {
         });
         rv.setAdapter(adapter);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();

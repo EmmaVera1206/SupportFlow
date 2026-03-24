@@ -35,7 +35,7 @@ public class Comment {
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 
-    // --- Sprint C: Comentarios ---
+    // --- Comentarios ---
     public interface CommentsCallback {
         void onSuccess(List<Comment> comments);
         void onError(Exception e);

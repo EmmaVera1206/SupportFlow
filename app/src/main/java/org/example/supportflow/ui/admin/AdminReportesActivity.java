@@ -1,4 +1,4 @@
-package org.example.supportflow.ui;
+package org.example.supportflow.ui.admin;
 
 import android.os.Bundle;
 import android.widget.Toast;

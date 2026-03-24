@@ -1,17 +1,22 @@
-package org.example.supportflow.ui;
+package org.example.supportflow.ui.admin;
 
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import org.example.supportflow.R;
 import org.example.supportflow.adapter.AdminTicketAdapter;
 import org.example.supportflow.data.TicketRepository;
 import org.example.supportflow.model.Ticket;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +58,12 @@ public class AdminTicketsActivity extends AppCompatActivity {
         }, false);
         rvAsignados.setAdapter(adapterAsignados);
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        findViewById(R.id.btnSalir).setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(AdminTicketsActivity.this, org.example.supportflow.ui.auth.LoginActivity.class));
+            finish();
+        });
+
         findViewById(R.id.btnFilter).setOnClickListener(v ->
                 startActivity(new Intent(AdminTicketsActivity.this, AdminReportesActivity.class))
         );
