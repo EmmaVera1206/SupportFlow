@@ -21,7 +21,8 @@ public class TicketRepository {
         void onError(Exception e);
     }
 
-    public void crearTicket(String title, String description, String category, String priority, String createdBy, SimpleCallback cb) {
+    // --- MÉTODO ACTUALIZADO ---
+    public void crearTicket(String title, String description, String category, String priority, String createdBy, String imageUrl, SimpleCallback cb) {
         Map<String, Object> t = new HashMap<>();
         t.put("title", title);
         t.put("description", description);
@@ -32,12 +33,16 @@ public class TicketRepository {
         t.put("createdBy", createdBy);
         t.put("assignedTo", null);
         t.put("closedAt", null);
+        // Guardamos la URL de la foto en la base de datos
+        t.put("imageUrl", imageUrl);
 
         db.collection("tickets")
                 .add(t)
                 .addOnSuccessListener(doc -> cb.onSuccess())
                 .addOnFailureListener(cb::onError);
     }
+
+    // --- MÉTODOS ORIGINALES (SIN CAMBIOS) ---
 
     public void escucharTicketsPorUsuario(String createdBy, TicketsCallback cb) {
         db.collection("tickets")
@@ -90,7 +95,6 @@ public class TicketRepository {
                 });
     }
 
-    // ✅ NUEVO: obtener todos los tickets (para admin)
     public void escucharTodosLosTickets(TicketsCallback cb) {
         db.collection("tickets")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -112,5 +116,4 @@ public class TicketRepository {
                     cb.onSuccess(list);
                 });
     }
-
 }
