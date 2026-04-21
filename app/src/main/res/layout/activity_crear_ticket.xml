@@ -5,169 +5,246 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#1A1A2E">
+    android:background="#0A0E27"> <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:paddingHorizontal="16dp"
+    android:background="#0A0E27">
 
-    <!-- Toolbar -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:paddingHorizontal="12dp">
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_media_previous"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Regresar"
+        app:tint="#FFFFFF"/>
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_media_previous"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Regresar"
-            app:tint="#FFFFFF"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Nuevo Ticket de Soporte"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.05"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Crear Ticket"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
+</RelativeLayout>
 
-    </RelativeLayout>
-
-    <!-- Contenido -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="18dp"
+            android:padding="20dp"
             android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#F2F2F2"
-                android:padding="18dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="#FFFFFF">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Título de ticket:"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#111111"/>
-
-                <EditText
-                    android:id="@+id/etTitle"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:drawable/edit_text"
-                    android:hint="Título"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="#111111"
-                    android:textColorHint="#999999"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Descripción:"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#111111"/>
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-                <EditText
-                    android:id="@+id/etDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="110dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:drawable/edit_text"
-                    android:gravity="top|start"
-                    android:hint="Descripción del problema..."
-                    android:minLines="4"
-                    android:padding="12dp"
-                    android:textColor="#111111"
-                    android:textColorHint="#999999"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Detalles del Problema"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="#1A1A2E"
+                        android:layout_marginBottom="20dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Categoría:"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#111111"/>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Título del Ticket"
+                        app:boxStrokeColor="#3F45B5"
+                        app:hintTextColor="#3F45B5"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <EditText
-                    android:id="@+id/etCategory"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:drawable/edit_text"
-                    android:hint="Ej. Soporte Técnico"
-                    android:paddingHorizontal="12dp"
-                    android:textColor="#111111"
-                    android:textColorHint="#999999"/>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textAutoCorrect"
+                            android:textColor="#111111"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Prioridad:"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#111111"/>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="Descripción detallada"
+                        app:boxStrokeColor="#3F45B5"
+                        app:hintTextColor="#3F45B5"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="¿Cuál es la prioridad de tu problema?"
-                    android:textSize="13sp"
-                    android:textColor="#777777"/>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="140dp"
+                            android:gravity="top|start"
+                            android:inputType="textMultiLine"
+                            android:overScrollMode="always"
+                            android:scrollbarStyle="insideInset"
+                            android:scrollbars="vertical"
+                            android:textColor="#111111"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/etPriority"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:drawable/edit_text"
-                    android:hint="LOW / MEDIUM / HIGH / CRITICAL"
-                    android:paddingHorizontal="12dp"
-                    android:textAllCaps="true"
-                    android:textColor="#111111"
-                    android:textColorHint="#999999"/>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:hint="Categoría"
+                        app:boxStrokeColor="#3F45B5"
+                        app:hintTextColor="#3F45B5"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-                <Button
-                    android:id="@+id/btnCrear"
-                    android:layout_width="180dp"
-                    android:layout_height="52dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="24dp"
-                    android:backgroundTint="#3F45B5"
-                    android:text="CREAR"
-                    android:textAllCaps="true"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textAutoCorrect"
+                            android:textColor="#111111"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="Nivel de Prioridad"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#555555"
+                        android:letterSpacing="0.03"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_spinner_profesional"
+                        android:paddingHorizontal="12dp">
+
+                        <Spinner
+                            android:id="@+id/spPriority"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"/>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="#777777"/>
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EEEEEE"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Evidencia "
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#1A1A2E"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Adjunta una foto para describir mejor el problema."
+                        android:textSize="13sp"
+                        android:textColor="#777777"
+                        android:layout_marginBottom="12dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/btn_tomar_foto"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:src="@android:drawable/ic_menu_camera"
+                            android:background="@drawable/bg_button_camara"
+                            android:contentDescription="Tomar foto del problema"
+                            android:scaleType="centerInside"
+                            app:tint="#3F45B5"/>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="90dp"
+                            android:layout_height="90dp"
+                            android:layout_marginStart="20dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#F5F5F5">
+
+                            <ImageView
+                                android:id="@+id/iv_preview"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:contentDescription="Vista previa"/>
+
+                            <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:src="@android:drawable/ic_menu_gallery"
+                                android:layout_gravity="center"
+                                app:tint="#CCCCCC"/>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnCrear"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="#3F45B5"
+                        android:text="Enviar Ticket"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.03"
+                        app:cornerRadius="16dp"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
 
-    <!-- Footer -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SupportFlow"
-        android:textColor="#AAAAAA"
-        android:textSize="12sp"
+        android:text="SupportFlow © 2024"
+        android:textColor="#66AAAAAA"
+        android:textSize="11sp"
         android:gravity="center"
-        android:paddingVertical="8dp"/>
+        android:paddingVertical="10dp"
+        android:letterSpacing="0.05"/>
 </LinearLayout>

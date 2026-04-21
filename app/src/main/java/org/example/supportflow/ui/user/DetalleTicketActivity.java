@@ -1,8 +1,10 @@
 package org.example.supportflow.ui.user;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,6 +33,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private CommentAdapter commentAdapter;
     private String ticketId;
+    private ImageView ivEvidence;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
         TextView tvDesc = findViewById(R.id.tvDesc);
         TextView tvMeta = findViewById(R.id.tvMeta);
         TextView tvAssigned = findViewById(R.id.tvAssigned);
+        ivEvidence = findViewById(R.id.ivEvidence);
 
         RecyclerView rvComments = findViewById(R.id.rvComments);
         rvComments.setLayoutManager(new LinearLayoutManager(this));
@@ -88,6 +93,18 @@ public class DetalleTicketActivity extends AppCompatActivity {
 
                             String assigned = (t.getAssignedTo() == null) ? "-" : t.getAssignedTo();
                             tvAssigned.setText("Técnico asignado: " + assigned);
+
+                            // Lógica de la imagen
+                            if (t.getImageUrl() != null && !t.getImageUrl().isEmpty()) {
+                                ivEvidence.setVisibility(View.VISIBLE);
+                                Glide.with(this)
+                                        .load(t.getImageUrl())
+                                        .placeholder(R.drawable.ic_launcher_foreground)
+                                        .error(R.drawable.ic_launcher_foreground)
+                                        .into(ivEvidence);
+                            } else {
+                                ivEvidence.setVisibility(View.GONE);
+                            }
                         }
                     }
                 });
@@ -125,7 +142,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
             Map<String, Object> comment = new HashMap<>();
             comment.put("message", msg);
             comment.put("authorId", uid);
-            comment.put("authorName", user.getEmail()); // por ahora email (luego name desde users)
+            comment.put("authorName", user.getEmail());
             comment.put("createdAt", System.currentTimeMillis());
 
             db.collection("tickets").document(ticketId)

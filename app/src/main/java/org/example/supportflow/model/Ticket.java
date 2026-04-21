@@ -11,10 +11,9 @@ public class Ticket {
     public String createdBy;
     public String assignedTo;
     public Long closedAt;
+    public String imageUrl;
 
     public Ticket() {}
-
-    // Getters y setters para cada propiedad
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -45,5 +44,8 @@ public class Ticket {
 
     public Long getClosedAt() { return closedAt; }
     public void setClosedAt(Long closedAt) { this.closedAt = closedAt; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
 }
