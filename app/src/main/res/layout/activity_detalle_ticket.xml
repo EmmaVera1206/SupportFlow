@@ -91,6 +91,15 @@
                     android:textColor="#111111"
                     android:textSize="16sp"/>
 
+                <ImageView
+                    android:id="@+id/ivEvidence"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    android:contentDescription="Evidencia"/>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
