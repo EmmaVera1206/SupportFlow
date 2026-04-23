@@ -3,7 +3,12 @@ package org.example.supportflow.ui.tecnico
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +28,18 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
     private lateinit var adapter: TicketTechAdapter
     private val db = FirebaseFirestore.getInstance()
     private var ticketsListener: ListenerRegistration? = null
+
+    private var todosLosTickets = mutableListOf<Ticket>()
+
+    private lateinit var tvEmpty: TextView
+    private lateinit var layoutFiltros: LinearLayout
+    private lateinit var spFilterCategory: Spinner
+    private lateinit var spFilterStatus: Spinner
+    private lateinit var spFilterPriority: Spinner
+
+    private var filtroCategoria = "Todas"
+    private var filtroEstado = "Todos"
+    private var filtroPrioridad = "Todas"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +62,31 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
         }
         rv.adapter = adapter
 
-        val btnLogout = findViewById<Button>(R.id.btnLogoutTecnico)
-        btnLogout.setOnClickListener {
-            hacerLogoutSeguro()
+        tvEmpty = findViewById(R.id.tvEmpty)
+        layoutFiltros = findViewById(R.id.layoutFiltrosTecnico)
+        spFilterCategory = findViewById(R.id.spFilterCategory)
+        spFilterStatus = findViewById(R.id.spFilterStatus)
+        spFilterPriority = findViewById(R.id.spFilterPriority)
+
+        configurarSpinnersFiltros()
+        configurarEventosFiltros()
+
+        findViewById<ImageButton>(R.id.btnBackTecnico).setOnClickListener {
+            finish()
         }
 
-        val tvEmpty = findViewById<TextView?>(R.id.tvEmpty)
+        findViewById<ImageButton>(R.id.btnFilterTecnico).setOnClickListener {
+            layoutFiltros.visibility =
+                if (layoutFiltros.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }
+
+        findViewById<Button>(R.id.btnClearFiltersTecnico).setOnClickListener {
+            limpiarFiltros()
+        }
+
+        findViewById<Button>(R.id.btnLogoutTecnico).setOnClickListener {
+            hacerLogoutSeguro()
+        }
 
         ticketsListener = db.collection("tickets")
             .whereEqualTo("assignedTo", uid)
@@ -70,9 +106,94 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
                     }
                 }
 
-                adapter.submit(list)
-                tvEmpty?.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+                todosLosTickets = list
+                aplicarFiltros()
             }
+    }
+
+    private fun configurarSpinnersFiltros() {
+        val categoryAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.ticket_filter_categories_tecnico,
+            android.R.layout.simple_spinner_item
+        )
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spFilterCategory.adapter = categoryAdapter
+
+        val statusAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.ticket_filter_status_tecnico,
+            android.R.layout.simple_spinner_item
+        )
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spFilterStatus.adapter = statusAdapter
+
+        val priorityAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.ticket_filter_priorities_tecnico,
+            android.R.layout.simple_spinner_item
+        )
+        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spFilterPriority.adapter = priorityAdapter
+    }
+
+    private fun configurarEventosFiltros() {
+        spFilterCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                filtroCategoria = spFilterCategory.selectedItem?.toString() ?: "Todas"
+                aplicarFiltros()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        spFilterStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                filtroEstado = spFilterStatus.selectedItem?.toString() ?: "Todos"
+                aplicarFiltros()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        spFilterPriority.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                filtroPrioridad = spFilterPriority.selectedItem?.toString() ?: "Todas"
+                aplicarFiltros()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun aplicarFiltros() {
+        val filtrados = todosLosTickets.filter { ticket ->
+            val coincideCategoria =
+                filtroCategoria == "Todas" || (ticket.category ?: "") == filtroCategoria
+
+            val coincideEstado =
+                filtroEstado == "Todos" || (ticket.status ?: "") == filtroEstado
+
+            val coincidePrioridad =
+                filtroPrioridad == "Todas" || (ticket.priority ?: "") == filtroPrioridad
+
+            coincideCategoria && coincideEstado && coincidePrioridad
+        }
+
+        adapter.submit(filtrados)
+        tvEmpty.visibility = if (filtrados.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun limpiarFiltros() {
+        spFilterCategory.setSelection(0)
+        spFilterStatus.setSelection(0)
+        spFilterPriority.setSelection(0)
+
+        filtroCategoria = "Todas"
+        filtroEstado = "Todos"
+        filtroPrioridad = "Todas"
+
+        aplicarFiltros()
     }
 
     private fun removerListeners() {

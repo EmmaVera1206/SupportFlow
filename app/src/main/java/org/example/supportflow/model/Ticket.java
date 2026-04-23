@@ -9,7 +9,9 @@ public class Ticket {
     public String status;
     public long createdAt;
     public String createdBy;
+    public String createdByName;
     public String assignedTo;
+    public String assignedToName;
     public Long closedAt;
     public String imageUrl;
 
@@ -39,13 +41,18 @@ public class Ticket {
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
+    public String getCreatedByName() { return createdByName; }
+    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
+
     public String getAssignedTo() { return assignedTo; }
     public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
+
+    public String getAssignedToName() { return assignedToName; }
+    public void setAssignedToName(String assignedToName) { this.assignedToName = assignedToName; }
 
     public Long getClosedAt() { return closedAt; }
     public void setClosedAt(Long closedAt) { this.closedAt = closedAt; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-
 }

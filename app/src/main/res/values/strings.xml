@@ -1,3 +1,49 @@
 <resources>
     <string name="app_name">SupportFlow</string>
+
+    <string-array name="ticket_categories">
+        <item>Soporte Técnico</item>
+        <item>Hardware</item>
+        <item>Software</item>
+        <item>Red e Internet</item>
+        <item>Acceso / Credenciales</item>
+        <item>Impresoras</item>
+        <item>Mantenimiento</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="ticket_priorities">
+        <item>LOW</item>
+        <item>MEDIUM</item>
+        <item>HIGH</item>
+        <item>CRITICAL</item>
+    </string-array>
+
+    <string-array name="ticket_filter_categories_tecnico">
+        <item>Todas</item>
+        <item>Soporte Técnico</item>
+        <item>Hardware</item>
+        <item>Software</item>
+        <item>Red e Internet</item>
+        <item>Acceso / Credenciales</item>
+        <item>Impresoras</item>
+        <item>Mantenimiento</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="ticket_filter_status_tecnico">
+        <item>Todos</item>
+        <item>OPEN</item>
+        <item>IN_PROGRESS</item>
+        <item>RESOLVED</item>
+    </string-array>
+
+    <string-array name="ticket_filter_priorities_tecnico">
+        <item>Todas</item>
+        <item>LOW</item>
+        <item>MEDIUM</item>
+        <item>HIGH</item>
+        <item>CRITICAL</item>
+    </string-array>
+
 </resources>

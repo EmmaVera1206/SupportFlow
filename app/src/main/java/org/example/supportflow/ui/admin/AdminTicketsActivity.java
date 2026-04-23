@@ -38,30 +38,40 @@ public class AdminTicketsActivity extends AppCompatActivity {
 
         RecyclerView rvSinAsignar = findViewById(R.id.rvSinAsignar);
         rvSinAsignar.setLayoutManager(new LinearLayoutManager(this));
-        adapterSinAsignar = new AdminTicketAdapter(new ArrayList<>(), new AdminTicketAdapter.OnTicketClickListener() {
-            @Override
-            public void onDetalles(Ticket ticket) {
-                abrirDetalle(ticket);
-            }
+        adapterSinAsignar = new AdminTicketAdapter(
+                new ArrayList<>(),
+                new AdminTicketAdapter.OnTicketClickListener() {
+                    @Override
+                    public void onDetalles(Ticket ticket) {
+                        abrirDetalle(ticket);
+                    }
 
-            @Override
-            public void onAsignar(Ticket ticket) {
-                mostrarDialogoAsignar(ticket);
-            }
-        }, true);
+                    @Override
+                    public void onAsignar(Ticket ticket) {
+                        mostrarDialogoAsignar(ticket);
+                    }
+                },
+                true
+        );
         rvSinAsignar.setAdapter(adapterSinAsignar);
 
         RecyclerView rvAsignados = findViewById(R.id.rvAsignados);
         rvAsignados.setLayoutManager(new LinearLayoutManager(this));
-        adapterAsignados = new AdminTicketAdapter(new ArrayList<>(), new AdminTicketAdapter.OnTicketClickListener() {
-            @Override
-            public void onDetalles(Ticket ticket) {
-                abrirDetalle(ticket);
-            }
+        adapterAsignados = new AdminTicketAdapter(
+                new ArrayList<>(),
+                new AdminTicketAdapter.OnTicketClickListener() {
+                    @Override
+                    public void onDetalles(Ticket ticket) {
+                        abrirDetalle(ticket);
+                    }
 
-            @Override
-            public void onAsignar(Ticket ticket) { }
-        }, false);
+                    @Override
+                    public void onAsignar(Ticket ticket) {
+                        // No aplica en la lista de asignados
+                    }
+                },
+                false
+        );
         rvAsignados.setAdapter(adapterAsignados);
 
         findViewById(R.id.btnSalir).setOnClickListener(v -> finish());
@@ -83,6 +93,7 @@ public class AdminTicketsActivity extends AppCompatActivity {
         i.putExtra(AdminDetalleTicketActivity.EXTRA_PRIORITY, ticket.getPriority());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_STATUS, ticket.getStatus());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO, ticket.getAssignedTo());
+        i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO_NAME, ticket.getAssignedToName());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_CREATED_AT, ticket.getCreatedAt());
         startActivity(i);
     }
@@ -97,8 +108,8 @@ public class AdminTicketsActivity extends AppCompatActivity {
 
                     for (var doc : snap.getDocuments()) {
                         String name = doc.getString("name");
-                        if (name != null) {
-                            nombres.add(name);
+                        if (name != null && !name.trim().isEmpty()) {
+                            nombres.add(name.trim());
                             uids.add(doc.getId());
                         }
                     }
@@ -125,7 +136,11 @@ public class AdminTicketsActivity extends AppCompatActivity {
 
     private void asignarTecnico(Ticket ticket, String tecnicoId, String tecnicoNombre) {
         db.collection("tickets").document(ticket.getId())
-                .update("assignedTo", tecnicoId, "status", "IN_PROGRESS")
+                .update(
+                        "assignedTo", tecnicoId,
+                        "assignedToName", tecnicoNombre,
+                        "status", "IN_PROGRESS"
+                )
                 .addOnSuccessListener(unused ->
                         Toast.makeText(this, "Ticket asignado a " + tecnicoNombre, Toast.LENGTH_SHORT).show()
                 )

@@ -20,6 +20,7 @@ class TecnicoDetalleActivity : AppCompatActivity() {
 
     private var cargandoEstadoInicial = true
     private var ultimoEstadoCargado: String? = null
+    private var currentUserName: String = "Técnico"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +31,15 @@ class TecnicoDetalleActivity : AppCompatActivity() {
             irALogin()
             return
         }
+
+        db.collection("users").document(user.uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val name = doc.getString("name")
+                if (!name.isNullOrBlank()) {
+                    currentUserName = name.trim()
+                }
+            }
 
         ticketId = intent.getStringExtra("TICKET_ID") ?: run {
             Toast.makeText(this, "Ticket inválido", Toast.LENGTH_SHORT).show()
@@ -135,7 +145,7 @@ class TecnicoDetalleActivity : AppCompatActivity() {
             val comment = hashMapOf<String, Any>(
                 "message" to msg,
                 "authorId" to user.uid,
-                "authorName" to (user.email ?: "Técnico"),
+                "authorName" to currentUserName,
                 "createdAt" to System.currentTimeMillis()
             )
 

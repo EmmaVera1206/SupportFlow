@@ -105,22 +105,38 @@
                             android:textColor="#111111"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:hint="Categoría"
-                        app:boxStrokeColor="#3F45B5"
-                        app:hintTextColor="#3F45B5"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                        android:text="Categoría"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#555555"
+                        android:letterSpacing="0.03"/>
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etCategory"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_spinner_profesional"
+                        android:paddingHorizontal="12dp">
+
+                        <Spinner
+                            android:id="@+id/spCategory"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="textAutoCorrect"
-                            android:textColor="#111111"/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:gravity="center_vertical"/>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:src="@android:drawable/arrow_down_float"
+                            app:tint="#777777"/>
+                    </RelativeLayout>
 
                     <TextView
                         android:layout_width="wrap_content"

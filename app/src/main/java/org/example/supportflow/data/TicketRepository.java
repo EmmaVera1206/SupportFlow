@@ -1,8 +1,8 @@
 package org.example.supportflow.data;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import org.example.supportflow.model.Ticket;
 
@@ -29,7 +29,16 @@ public class TicketRepository {
         void onError(Exception e);
     }
 
-    public void crearTicket(String title, String description, String category, String priority, String createdBy, String imageUrl, SimpleCallback cb) {
+    public void crearTicket(
+            String title,
+            String description,
+            String category,
+            String priority,
+            String createdBy,
+            String createdByName,
+            String imageUrl,
+            SimpleCallback cb
+    ) {
         Map<String, Object> t = new HashMap<>();
         t.put("title", title);
         t.put("description", description);
@@ -38,7 +47,9 @@ public class TicketRepository {
         t.put("status", "OPEN");
         t.put("createdAt", System.currentTimeMillis());
         t.put("createdBy", createdBy);
+        t.put("createdByName", createdByName);
         t.put("assignedTo", null);
+        t.put("assignedToName", null);
         t.put("closedAt", null);
         t.put("imageUrl", imageUrl);
 
@@ -80,10 +91,12 @@ public class TicketRepository {
                         cb.onError(e);
                         return;
                     }
+
                     if (doc == null || !doc.exists()) {
                         cb.onNotFound();
                         return;
                     }
+
                     Ticket t = doc.toObject(Ticket.class);
                     if (t != null) {
                         t.setId(doc.getId());

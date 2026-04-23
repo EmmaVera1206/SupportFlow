@@ -41,6 +41,8 @@ public class DetalleTicketActivity extends AppCompatActivity {
     private ListenerRegistration ticketListener;
     private ListenerRegistration commentsListener;
 
+    private String currentUserName = "Usuario";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +54,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
             irALogin();
             return;
         }
+
         String uid = user.getUid();
 
         ticketId = getIntent().getStringExtra("TICKET_ID");
@@ -62,6 +65,16 @@ public class DetalleTicketActivity extends AppCompatActivity {
         }
 
         db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("name");
+                        if (name != null && !name.trim().isEmpty()) {
+                            currentUserName = name.trim();
+                        }
+                    }
+                });
 
         TextView tvTitle = findViewById(R.id.tvTitle);
         TextView tvDesc = findViewById(R.id.tvDesc);
@@ -90,6 +103,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
                         Toast.makeText(this, "Error leyendo ticket", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
                     if (doc != null && doc.exists()) {
                         Ticket t = doc.toObject(Ticket.class);
                         if (t != null) {
@@ -101,8 +115,10 @@ public class DetalleTicketActivity extends AppCompatActivity {
                                     + " | Estado: " + t.getStatus();
                             tvMeta.setText(meta);
 
-                            String assigned = (t.getAssignedTo() == null) ? "-" : t.getAssignedTo();
-                            tvAssigned.setText("Técnico asignado: " + assigned);
+                            String assignedName = (t.getAssignedToName() != null && !t.getAssignedToName().trim().isEmpty())
+                                    ? t.getAssignedToName()
+                                    : "Sin asignar";
+                            tvAssigned.setText("Técnico asignado: " + assignedName);
 
                             if (t.getImageUrl() != null && !t.getImageUrl().isEmpty()) {
                                 ivEvidence.setVisibility(View.VISIBLE);
@@ -126,6 +142,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
                         Toast.makeText(this, "Error leyendo comentarios", Toast.LENGTH_SHORT).show();
                         return;
                     }
+
                     List<Comment> list = new ArrayList<>();
                     if (snap != null) {
                         for (var d : snap.getDocuments()) {
@@ -149,7 +166,7 @@ public class DetalleTicketActivity extends AppCompatActivity {
             Map<String, Object> comment = new HashMap<>();
             comment.put("message", msg);
             comment.put("authorId", uid);
-            comment.put("authorName", user.getEmail());
+            comment.put("authorName", currentUserName);
             comment.put("createdAt", System.currentTimeMillis());
 
             db.collection("tickets").document(ticketId)

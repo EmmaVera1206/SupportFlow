@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -31,6 +32,7 @@ public class CrearTicketActivity extends AppCompatActivity {
 
     private final TicketRepository repo = new TicketRepository();
     private Bitmap imagenCapturada = null;
+    private String currentUserName = "Usuario";
 
     private final ActivityResultLauncher<Void> takePictureLauncher = registerForActivityResult(
             new ActivityResultContracts.TakePicturePreview(),
@@ -65,19 +67,43 @@ public class CrearTicketActivity extends AppCompatActivity {
             finish();
             return;
         }
+
         String uid = user.getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("name");
+                        if (name != null && !name.trim().isEmpty()) {
+                            currentUserName = name.trim();
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> currentUserName = "Usuario");
 
         EditText etTitle = findViewById(R.id.etTitle);
         EditText etDesc = findViewById(R.id.etDescription);
-        EditText etCat = findViewById(R.id.etCategory);
+        Spinner spCategory = findViewById(R.id.spCategory);
         Spinner spPriority = findViewById(R.id.spPriority);
         Button btnCrear = findViewById(R.id.btnCrear);
         ImageButton btnTomarFoto = findViewById(R.id.btn_tomar_foto);
 
-        String[] opcionesPrioridad = {"LOW", "MEDIUM", "HIGH"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, opcionesPrioridad);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spPriority.setAdapter(adapter);
+        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.ticket_categories,
+                android.R.layout.simple_spinner_item
+        );
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spCategory.setAdapter(categoryAdapter);
+
+        ArrayAdapter<CharSequence> priorityAdapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.ticket_priorities,
+                android.R.layout.simple_spinner_item
+        );
+        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spPriority.setAdapter(priorityAdapter);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
@@ -92,13 +118,19 @@ public class CrearTicketActivity extends AppCompatActivity {
         btnCrear.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String desc = etDesc.getText().toString().trim();
-            String cat = etCat.getText().toString().trim();
-            String pri = spPriority.getSelectedItem().toString().toUpperCase();
+            String cat = spCategory.getSelectedItem() != null
+                    ? spCategory.getSelectedItem().toString().trim()
+                    : "";
+            String pri = spPriority.getSelectedItem() != null
+                    ? spPriority.getSelectedItem().toString().trim().toUpperCase()
+                    : "";
 
-            if (title.isEmpty() || desc.isEmpty() || cat.isEmpty()) {
+            if (title.isEmpty() || desc.isEmpty() || cat.isEmpty() || pri.isEmpty()) {
                 Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            btnCrear.setEnabled(false);
 
             if (imagenCapturada != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -106,38 +138,67 @@ public class CrearTicketActivity extends AppCompatActivity {
                 byte[] data = baos.toByteArray();
 
                 StorageReference storageRef = FirebaseStorage.getInstance()
-                        .getReference().child("tickets/" + UUID.randomUUID().toString() + ".jpg");
+                        .getReference()
+                        .child("tickets/" + UUID.randomUUID() + ".jpg");
 
-                storageRef.putBytes(data).addOnSuccessListener(taskSnapshot -> {
-                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        String downloadUrl = uri.toString();
-                        repo.crearTicket(title, desc, cat, pri, uid, downloadUrl, new TicketRepository.SimpleCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Toast.makeText(CrearTicketActivity.this, "Ticket creado con foto ✅", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                            @Override
-                            public void onError(Exception e) {
-                                Toast.makeText(CrearTicketActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
+                storageRef.putBytes(data)
+                        .addOnSuccessListener(taskSnapshot ->
+                                storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                    String downloadUrl = uri.toString();
+                                    repo.crearTicket(
+                                            title,
+                                            desc,
+                                            cat,
+                                            pri,
+                                            uid,
+                                            currentUserName,
+                                            downloadUrl,
+                                            new TicketRepository.SimpleCallback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    Toast.makeText(CrearTicketActivity.this, "Ticket creado con foto ✅", Toast.LENGTH_SHORT).show();
+                                                    setResult(RESULT_OK);
+                                                    finish();
+                                                }
+
+                                                @Override
+                                                public void onError(Exception e) {
+                                                    btnCrear.setEnabled(true);
+                                                    Toast.makeText(CrearTicketActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                    );
+                                })
+                        )
+                        .addOnFailureListener(e -> {
+                            btnCrear.setEnabled(true);
+                            Toast.makeText(this, "Error al subir foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
-                    });
-                }).addOnFailureListener(e -> Toast.makeText(this, "Error al subir foto: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
             } else {
-                repo.crearTicket(title, desc, cat, pri, uid, "", new TicketRepository.SimpleCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(CrearTicketActivity.this, "Ticket creado sin foto ✅", Toast.LENGTH_SHORT).show();
-                        setResult(RESULT_OK);
-                        finish();
-                    }
-                    @Override
-                    public void onError(Exception e) {
-                        Toast.makeText(CrearTicketActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                repo.crearTicket(
+                        title,
+                        desc,
+                        cat,
+                        pri,
+                        uid,
+                        currentUserName,
+                        "",
+                        new TicketRepository.SimpleCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(CrearTicketActivity.this, "Ticket creado sin foto ✅", Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                btnCrear.setEnabled(true);
+                                Toast.makeText(CrearTicketActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             }
         });
     }
