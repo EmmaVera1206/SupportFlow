@@ -2,6 +2,8 @@ package org.example.supportflow.data;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import org.example.supportflow.model.Ticket;
 
 import java.util.HashMap;
@@ -21,7 +23,12 @@ public class TicketRepository {
         void onError(Exception e);
     }
 
-    // --- MÉTODO ACTUALIZADO ---
+    public interface TicketCallback {
+        void onSuccess(Ticket ticket);
+        void onNotFound();
+        void onError(Exception e);
+    }
+
     public void crearTicket(String title, String description, String category, String priority, String createdBy, String imageUrl, SimpleCallback cb) {
         Map<String, Object> t = new HashMap<>();
         t.put("title", title);
@@ -33,7 +40,6 @@ public class TicketRepository {
         t.put("createdBy", createdBy);
         t.put("assignedTo", null);
         t.put("closedAt", null);
-        // Guardamos la URL de la foto en la base de datos
         t.put("imageUrl", imageUrl);
 
         db.collection("tickets")
@@ -42,10 +48,8 @@ public class TicketRepository {
                 .addOnFailureListener(cb::onError);
     }
 
-    // --- MÉTODOS ORIGINALES (SIN CAMBIOS) ---
-
-    public void escucharTicketsPorUsuario(String createdBy, TicketsCallback cb) {
-        db.collection("tickets")
+    public ListenerRegistration escucharTicketsPorUsuario(String createdBy, TicketsCallback cb) {
+        return db.collection("tickets")
                 .whereEqualTo("createdBy", createdBy)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((snap, e) -> {
@@ -53,6 +57,7 @@ public class TicketRepository {
                         cb.onError(e);
                         return;
                     }
+
                     java.util.List<Ticket> list = new java.util.ArrayList<>();
                     if (snap != null) {
                         for (var doc : snap.getDocuments()) {
@@ -67,14 +72,8 @@ public class TicketRepository {
                 });
     }
 
-    public interface TicketCallback {
-        void onSuccess(Ticket ticket);
-        void onNotFound();
-        void onError(Exception e);
-    }
-
-    public void escucharTicketPorId(String ticketId, TicketCallback cb) {
-        db.collection("tickets")
+    public ListenerRegistration escucharTicketPorId(String ticketId, TicketCallback cb) {
+        return db.collection("tickets")
                 .document(ticketId)
                 .addSnapshotListener((doc, e) -> {
                     if (e != null) {
@@ -95,14 +94,15 @@ public class TicketRepository {
                 });
     }
 
-    public void escucharTodosLosTickets(TicketsCallback cb) {
-        db.collection("tickets")
+    public ListenerRegistration escucharTodosLosTickets(TicketsCallback cb) {
+        return db.collection("tickets")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((snap, e) -> {
                     if (e != null) {
                         cb.onError(e);
                         return;
                     }
+
                     java.util.List<Ticket> list = new java.util.ArrayList<>();
                     if (snap != null) {
                         for (var doc : snap.getDocuments()) {

@@ -130,6 +130,7 @@ public class CrearTicketActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess() {
                         Toast.makeText(CrearTicketActivity.this, "Ticket creado sin foto ✅", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
                         finish();
                     }
                     @Override

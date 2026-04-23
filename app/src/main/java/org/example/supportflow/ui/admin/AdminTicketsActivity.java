@@ -4,16 +4,21 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
 import org.example.supportflow.R;
 import org.example.supportflow.adapter.AdminTicketAdapter;
 import org.example.supportflow.data.TicketRepository;
 import org.example.supportflow.model.Ticket;
 import org.example.supportflow.ui.auth.LoginActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +28,8 @@ public class AdminTicketsActivity extends AppCompatActivity {
     private AdminTicketAdapter adapterAsignados;
     private final TicketRepository repo = new TicketRepository();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private ListenerRegistration ticketsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,7 @@ public class AdminTicketsActivity extends AppCompatActivity {
             public void onDetalles(Ticket ticket) {
                 abrirDetalle(ticket);
             }
+
             @Override
             public void onAsignar(Ticket ticket) {
                 mostrarDialogoAsignar(ticket);
@@ -50,26 +58,19 @@ public class AdminTicketsActivity extends AppCompatActivity {
             public void onDetalles(Ticket ticket) {
                 abrirDetalle(ticket);
             }
+
             @Override
             public void onAsignar(Ticket ticket) { }
         }, false);
         rvAsignados.setAdapter(adapterAsignados);
 
-        // Botón regresar
         findViewById(R.id.btnSalir).setOnClickListener(v -> finish());
 
-        // Botón reportes
         findViewById(R.id.btnFilter).setOnClickListener(v ->
                 startActivity(new Intent(AdminTicketsActivity.this, AdminReportesActivity.class))
         );
 
-        // ✅ Botón cerrar sesión
-        findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(this, LoginActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-        });
+        findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> hacerLogoutSeguro());
 
         cargarTickets();
     }
@@ -134,7 +135,7 @@ public class AdminTicketsActivity extends AppCompatActivity {
     }
 
     private void cargarTickets() {
-        repo.escucharTodosLosTickets(new TicketRepository.TicketsCallback() {
+        ticketsListener = repo.escucharTodosLosTickets(new TicketRepository.TicketsCallback() {
             @Override
             public void onSuccess(List<Ticket> tickets) {
                 List<Ticket> sinAsignar = new ArrayList<>();
@@ -157,5 +158,28 @@ public class AdminTicketsActivity extends AppCompatActivity {
                 Toast.makeText(AdminTicketsActivity.this, "Error al cargar tickets", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void removerListeners() {
+        if (ticketsListener != null) {
+            ticketsListener.remove();
+            ticketsListener = null;
+        }
+    }
+
+    private void hacerLogoutSeguro() {
+        removerListeners();
+        FirebaseAuth.getInstance().signOut();
+
+        Intent i = new Intent(this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        removerListeners();
+        super.onDestroy();
     }
 }

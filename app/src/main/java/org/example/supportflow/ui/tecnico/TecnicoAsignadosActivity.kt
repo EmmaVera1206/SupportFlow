@@ -2,6 +2,7 @@ package org.example.supportflow.ui.tecnico
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -10,16 +11,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import org.example.supportflow.R
+import org.example.supportflow.adapter.TicketTechAdapter
 import org.example.supportflow.model.Ticket
 import org.example.supportflow.ui.auth.LoginActivity
-import org.example.supportflow.adapter.TicketTechAdapter
 
 class TecnicoAsignadosActivity : AppCompatActivity() {
 
     private lateinit var adapter: TicketTechAdapter
     private val db = FirebaseFirestore.getInstance()
+    private var ticketsListener: ListenerRegistration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,8 +30,7 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
 
         val user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            irALogin()
             return
         }
         val uid = user.uid
@@ -43,19 +45,14 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
         }
         rv.adapter = adapter
 
-
         val btnLogout = findViewById<Button>(R.id.btnLogoutTecnico)
         btnLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            hacerLogoutSeguro()
         }
-
 
         val tvEmpty = findViewById<TextView?>(R.id.tvEmpty)
 
-        // Query tickets asignados
-        db.collection("tickets")
+        ticketsListener = db.collection("tickets")
             .whereEqualTo("assignedTo", uid)
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snap, e ->
@@ -74,7 +71,30 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
                 }
 
                 adapter.submit(list)
-                tvEmpty?.visibility = if (list.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+                tvEmpty?.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
             }
+    }
+
+    private fun removerListeners() {
+        ticketsListener?.remove()
+        ticketsListener = null
+    }
+
+    private fun hacerLogoutSeguro() {
+        removerListeners()
+        FirebaseAuth.getInstance().signOut()
+        irALogin()
+    }
+
+    private fun irALogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+        finish()
+    }
+
+    override fun onDestroy() {
+        removerListeners()
+        super.onDestroy()
     }
 }
