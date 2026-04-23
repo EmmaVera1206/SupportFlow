@@ -2,14 +2,18 @@ package org.example.supportflow.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import org.example.supportflow.R;
 
 import java.util.HashMap;
@@ -32,6 +36,9 @@ public class RegisterActivity extends AppCompatActivity {
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
         Button btnRegister = findViewById(R.id.btnRegister);
+        TextView tvIrLogin = findViewById(R.id.tvIrLogin);
+
+        tvIrLogin.setOnClickListener(v -> finish());
 
         btnRegister.setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
@@ -42,34 +49,71 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Ingresa un correo válido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (pass.length() < 6) {
                 Toast.makeText(this, "La contraseña debe tener mínimo 6 caracteres", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            btnRegister.setEnabled(false);
+
             auth.createUserWithEmailAndPassword(email, pass)
                     .addOnSuccessListener(result -> {
-                        String uid = result.getUser().getUid();
+                        FirebaseUser firebaseUser = result.getUser();
+
+                        if (firebaseUser == null) {
+                            btnRegister.setEnabled(true);
+                            Toast.makeText(this, "No se pudo crear la cuenta", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String uid = firebaseUser.getUid();
 
                         Map<String, Object> userDoc = new HashMap<>();
                         userDoc.put("name", name);
                         userDoc.put("email", email);
-                        userDoc.put("role", "USER"); // ✅ opción B
+                        userDoc.put("role", "USER");
                         userDoc.put("createdAt", System.currentTimeMillis());
 
                         db.collection("users").document(uid)
                                 .set(userDoc)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Cuenta creada ✅", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(this, RoleRouterActivity.class));
-                                    finish();
-                                })
+                                .addOnSuccessListener(aVoid -> firebaseUser.sendEmailVerification()
+                                        .addOnSuccessListener(unused -> {
+                                            auth.signOut();
+
+                                            Toast.makeText(
+                                                    this,
+                                                    "Cuenta creada. Revisa tu correo para verificarla antes de iniciar sesión.",
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+
+                                            Intent intent = new Intent(this, LoginActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            btnRegister.setEnabled(true);
+                                            Toast.makeText(
+                                                    this,
+                                                    "Cuenta creada, pero no se pudo enviar el correo de verificación: " + e.getMessage(),
+                                                    Toast.LENGTH_LONG
+                                            ).show();
+                                        }))
                                 .addOnFailureListener(e -> {
+                                    btnRegister.setEnabled(true);
                                     Toast.makeText(this, "Error guardando perfil: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });
-
                     })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnFailureListener(e -> {
+                        btnRegister.setEnabled(true);
+                        Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         });
     }
 }

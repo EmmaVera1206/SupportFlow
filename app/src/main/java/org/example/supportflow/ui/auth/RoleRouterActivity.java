@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.example.supportflow.ui.admin.AdminTicketsActivity;
@@ -20,49 +21,83 @@ public class RoleRouterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null) {
+            irALogin();
             return;
         }
 
-        String uid = auth.getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        user.reload()
+                .addOnSuccessListener(unused -> {
+                    FirebaseUser refreshedUser = auth.getCurrentUser();
 
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) {
-                        Toast.makeText(this, "No existe perfil de usuario", Toast.LENGTH_SHORT).show();
-                        auth.signOut();
-                        startActivity(new Intent(this, LoginActivity.class));
-                        finish();
+                    if (refreshedUser == null) {
+                        irALogin();
                         return;
                     }
 
-                    String role = doc.getString("role");
-                    if (role == null) role = "USER";
-
-                    Intent i;
-                    switch (role) {
-                        case "TECH":
-                            i = new Intent(this, TecnicoAsignadosActivity.class);
-                            break;
-                        case "ADMIN":
-                            // ✅ Ahora manda al admin a su pantalla
-                            i = new Intent(this, AdminTicketsActivity.class);
-                            break;
-                        default:
-                            i = new Intent(this, MisTicketsActivity.class);
-                            break;
+                    if (!refreshedUser.isEmailVerified()) {
+                        Toast.makeText(
+                                this,
+                                "Verifica tu correo antes de continuar.",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        auth.signOut();
+                        irALogin();
+                        return;
                     }
 
-                    i.putExtra("ROLE", role);
-                    startActivity(i);
-                    finish();
+                    String uid = refreshedUser.getUid();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                    db.collection("users").document(uid).get()
+                            .addOnSuccessListener(doc -> {
+                                if (!doc.exists()) {
+                                    Toast.makeText(this, "No existe perfil de usuario", Toast.LENGTH_SHORT).show();
+                                    auth.signOut();
+                                    irALogin();
+                                    return;
+                                }
+
+                                String role = doc.getString("role");
+                                if (role == null) role = "USER";
+
+                                Intent i;
+                                switch (role) {
+                                    case "TECH":
+                                        i = new Intent(this, TecnicoAsignadosActivity.class);
+                                        break;
+                                    case "ADMIN":
+                                        i = new Intent(this, AdminTicketsActivity.class);
+                                        break;
+                                    default:
+                                        i = new Intent(this, MisTicketsActivity.class);
+                                        break;
+                                }
+
+                                i.putExtra("ROLE", role);
+                                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Error leyendo rol: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                auth.signOut();
+                                irALogin();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error leyendo rol: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(this, "Error validando usuario: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    auth.signOut();
+                    irALogin();
                 });
+    }
+
+    private void irALogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }
