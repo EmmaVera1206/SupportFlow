@@ -3,6 +3,11 @@ package org.example.supportflow.ui.admin;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,16 +25,32 @@ import org.example.supportflow.model.Ticket;
 import org.example.supportflow.ui.auth.LoginActivity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AdminTicketsActivity extends AppCompatActivity {
 
     private AdminTicketAdapter adapterSinAsignar;
     private AdminTicketAdapter adapterAsignados;
+
     private final TicketRepository repo = new TicketRepository();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private ListenerRegistration ticketsListener;
+
+    private final List<Ticket> todosLosTickets = new ArrayList<>();
+
+    private String filtroPrioridad = "Todas";
+    private String filtroEstado = "Todos";
+    private String filtroCategoria = "Todas";
+    private String filtroTecnico = "Todos";
+
+    private LinearLayout layoutFiltrosAdmin;
+    private Spinner spFilterPriorityAdmin;
+    private Spinner spFilterStatusAdmin;
+    private Spinner spFilterCategoryAdmin;
+    private Spinner spFilterTechnicianAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +61,22 @@ public class AdminTicketsActivity extends AppCompatActivity {
         rvSinAsignar.setLayoutManager(new LinearLayoutManager(this));
         adapterSinAsignar = new AdminTicketAdapter(
                 new ArrayList<>(),
-                new AdminTicketAdapter.OnTicketClickListener() {
+                new AdminTicketAdapter.OnTicketActionListener() {
                     @Override
                     public void onDetalles(Ticket ticket) {
                         abrirDetalle(ticket);
                     }
 
                     @Override
-                    public void onAsignar(Ticket ticket) {
+                    public void onAsignarOCambiar(Ticket ticket) {
                         mostrarDialogoAsignar(ticket);
                     }
-                },
-                true
+
+                    @Override
+                    public void onEliminar(Ticket ticket) {
+                        confirmarEliminarTicket(ticket);
+                    }
+                }
         );
         rvSinAsignar.setAdapter(adapterSinAsignar);
 
@@ -59,34 +84,143 @@ public class AdminTicketsActivity extends AppCompatActivity {
         rvAsignados.setLayoutManager(new LinearLayoutManager(this));
         adapterAsignados = new AdminTicketAdapter(
                 new ArrayList<>(),
-                new AdminTicketAdapter.OnTicketClickListener() {
+                new AdminTicketAdapter.OnTicketActionListener() {
                     @Override
                     public void onDetalles(Ticket ticket) {
                         abrirDetalle(ticket);
                     }
 
                     @Override
-                    public void onAsignar(Ticket ticket) {
-                        // No aplica en la lista de asignados
+                    public void onAsignarOCambiar(Ticket ticket) {
+                        mostrarDialogoAsignar(ticket);
                     }
-                },
-                false
+
+                    @Override
+                    public void onEliminar(Ticket ticket) {
+                        confirmarEliminarTicket(ticket);
+                    }
+                }
         );
         rvAsignados.setAdapter(adapterAsignados);
 
+        layoutFiltrosAdmin = findViewById(R.id.layoutFiltrosAdmin);
+        spFilterPriorityAdmin = findViewById(R.id.spFilterPriorityAdmin);
+        spFilterStatusAdmin = findViewById(R.id.spFilterStatusAdmin);
+        spFilterCategoryAdmin = findViewById(R.id.spFilterCategoryAdmin);
+        spFilterTechnicianAdmin = findViewById(R.id.spFilterTechnicianAdmin);
+
+        configurarSpinnersBase();
+        configurarEventosFiltros();
+
         findViewById(R.id.btnSalir).setOnClickListener(v -> finish());
 
-        findViewById(R.id.btnFilter).setOnClickListener(v ->
+        ImageButton btnFilter = findViewById(R.id.btnFilter);
+        btnFilter.setOnClickListener(v -> {
+            if (layoutFiltrosAdmin.getVisibility() == View.VISIBLE) {
+                layoutFiltrosAdmin.setVisibility(View.GONE);
+            } else {
+                layoutFiltrosAdmin.setVisibility(View.VISIBLE);
+            }
+        });
+
+        ImageButton btnReportes = findViewById(R.id.btnReportesAdmin);
+        btnReportes.setOnClickListener(v ->
                 startActivity(new Intent(AdminTicketsActivity.this, AdminReportesActivity.class))
         );
+
+        findViewById(R.id.btnClearFiltersAdmin).setOnClickListener(v -> limpiarFiltros());
 
         findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> hacerLogoutSeguro());
 
         cargarTickets();
     }
 
+    private void configurarSpinnersBase() {
+        String[] prioridades = {"Todas", "LOW", "MEDIUM", "HIGH", "CRITICAL"};
+        String[] estados = {"Todos", "OPEN", "IN_PROGRESS", "RESOLVED"};
+
+        ArrayAdapter<String> priorityAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                prioridades
+        );
+        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterPriorityAdmin.setAdapter(priorityAdapter);
+
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                estados
+        );
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterStatusAdmin.setAdapter(statusAdapter);
+
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Todas"}
+        );
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterCategoryAdmin.setAdapter(categoryAdapter);
+
+        ArrayAdapter<String> technicianAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new String[]{"Todos"}
+        );
+        technicianAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterTechnicianAdmin.setAdapter(technicianAdapter);
+    }
+
+    private void configurarEventosFiltros() {
+        spFilterPriorityAdmin.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                filtroPrioridad = spFilterPriorityAdmin.getSelectedItem().toString();
+                aplicarFiltros();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+
+        spFilterStatusAdmin.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                filtroEstado = spFilterStatusAdmin.getSelectedItem().toString();
+                aplicarFiltros();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+
+        spFilterCategoryAdmin.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                filtroCategoria = spFilterCategoryAdmin.getSelectedItem().toString();
+                aplicarFiltros();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+
+        spFilterTechnicianAdmin.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                filtroTecnico = spFilterTechnicianAdmin.getSelectedItem().toString();
+                aplicarFiltros();
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+    }
+
     private void abrirDetalle(Ticket ticket) {
         Intent i = new Intent(this, AdminDetalleTicketActivity.class);
+        i.putExtra(AdminDetalleTicketActivity.EXTRA_TICKET_ID, ticket.getId());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_TITLE, ticket.getTitle());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_DESCRIPTION, ticket.getDescription());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_CATEGORY, ticket.getCategory());
@@ -119,8 +253,12 @@ public class AdminTicketsActivity extends AppCompatActivity {
                         return;
                     }
 
+                    String titulo = (ticket.getAssignedTo() == null || ticket.getAssignedTo().isEmpty())
+                            ? "Asignar Técnico"
+                            : "Cambiar Técnico";
+
                     new AlertDialog.Builder(this)
-                            .setTitle("Seleccionar Técnico")
+                            .setTitle(titulo)
                             .setItems(nombres.toArray(new String[0]), (dialog, which) -> {
                                 String tecnicoId = uids.get(which);
                                 String tecnicoNombre = nombres.get(which);
@@ -141,11 +279,34 @@ public class AdminTicketsActivity extends AppCompatActivity {
                         "assignedToName", tecnicoNombre,
                         "status", "IN_PROGRESS"
                 )
+                .addOnSuccessListener(unused -> {
+                    String mensaje = (ticket.getAssignedTo() == null || ticket.getAssignedTo().isEmpty())
+                            ? "Ticket asignado a " + tecnicoNombre
+                            : "Técnico cambiado a " + tecnicoNombre;
+                    Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Error al asignar/cambiar técnico", Toast.LENGTH_SHORT).show()
+                );
+    }
+
+    private void confirmarEliminarTicket(Ticket ticket) {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar ticket")
+                .setMessage("¿Seguro que deseas eliminar este ticket?\n\n" + ticket.getTitle())
+                .setPositiveButton("Eliminar", (dialog, which) -> eliminarTicket(ticket))
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void eliminarTicket(Ticket ticket) {
+        db.collection("tickets").document(ticket.getId())
+                .delete()
                 .addOnSuccessListener(unused ->
-                        Toast.makeText(this, "Ticket asignado a " + tecnicoNombre, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Ticket eliminado correctamente", Toast.LENGTH_SHORT).show()
                 )
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error al asignar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Error al eliminar ticket", Toast.LENGTH_SHORT).show()
                 );
     }
 
@@ -153,19 +314,10 @@ public class AdminTicketsActivity extends AppCompatActivity {
         ticketsListener = repo.escucharTodosLosTickets(new TicketRepository.TicketsCallback() {
             @Override
             public void onSuccess(List<Ticket> tickets) {
-                List<Ticket> sinAsignar = new ArrayList<>();
-                List<Ticket> asignados = new ArrayList<>();
-
-                for (Ticket t : tickets) {
-                    if (t.getAssignedTo() == null || t.getAssignedTo().isEmpty()) {
-                        sinAsignar.add(t);
-                    } else {
-                        asignados.add(t);
-                    }
-                }
-
-                adapterSinAsignar.setTickets(sinAsignar);
-                adapterAsignados.setTickets(asignados);
+                todosLosTickets.clear();
+                todosLosTickets.addAll(tickets);
+                actualizarOpcionesDinamicas();
+                aplicarFiltros();
             }
 
             @Override
@@ -173,6 +325,115 @@ public class AdminTicketsActivity extends AppCompatActivity {
                 Toast.makeText(AdminTicketsActivity.this, "Error al cargar tickets", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void actualizarOpcionesDinamicas() {
+        Set<String> categorias = new LinkedHashSet<>();
+        Set<String> tecnicos = new LinkedHashSet<>();
+
+        categorias.add("Todas");
+        tecnicos.add("Todos");
+
+        for (Ticket t : todosLosTickets) {
+            if (t.getCategory() != null && !t.getCategory().trim().isEmpty()) {
+                categorias.add(t.getCategory().trim());
+            }
+
+            if (t.getAssignedToName() != null && !t.getAssignedToName().trim().isEmpty()) {
+                tecnicos.add(t.getAssignedToName().trim());
+            }
+        }
+
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new ArrayList<>(categorias)
+        );
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterCategoryAdmin.setAdapter(categoryAdapter);
+
+        ArrayAdapter<String> technicianAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                new ArrayList<>(tecnicos)
+        );
+        technicianAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFilterTechnicianAdmin.setAdapter(technicianAdapter);
+
+        restaurarSeleccionSiExiste(spFilterCategoryAdmin, filtroCategoria, "Todas");
+        restaurarSeleccionSiExiste(spFilterTechnicianAdmin, filtroTecnico, "Todos");
+    }
+
+    private void restaurarSeleccionSiExiste(Spinner spinner, String valor, String fallback) {
+        if (spinner == null || spinner.getAdapter() == null) return;
+        android.widget.Adapter adapter = spinner.getAdapter();
+        int count = adapter.getCount();
+
+        for (int i = 0; i < count; i++) {
+            Object item = adapter.getItem(i);
+            if (item != null && item.toString().equals(valor)) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+
+        for (int i = 0; i < count; i++) {
+            Object item = adapter.getItem(i);
+            if (item != null && item.toString().equals(fallback)) {
+                spinner.setSelection(i);
+                return;
+            }
+        }
+    }
+
+    private void aplicarFiltros() {
+        List<Ticket> sinAsignar = new ArrayList<>();
+        List<Ticket> asignados = new ArrayList<>();
+
+        for (Ticket t : todosLosTickets) {
+            boolean coincidePrioridad =
+                    "Todas".equals(filtroPrioridad) ||
+                            (t.getPriority() != null && t.getPriority().equals(filtroPrioridad));
+
+            boolean coincideEstado =
+                    "Todos".equals(filtroEstado) ||
+                            (t.getStatus() != null && t.getStatus().equals(filtroEstado));
+
+            boolean coincideCategoria =
+                    "Todas".equals(filtroCategoria) ||
+                            (t.getCategory() != null && t.getCategory().equals(filtroCategoria));
+
+            boolean coincideTecnico =
+                    "Todos".equals(filtroTecnico) ||
+                            (t.getAssignedToName() != null && t.getAssignedToName().equals(filtroTecnico));
+
+            if (!(coincidePrioridad && coincideEstado && coincideCategoria && coincideTecnico)) {
+                continue;
+            }
+
+            if (t.getAssignedTo() == null || t.getAssignedTo().isEmpty()) {
+                sinAsignar.add(t);
+            } else {
+                asignados.add(t);
+            }
+        }
+
+        adapterSinAsignar.setTickets(sinAsignar);
+        adapterAsignados.setTickets(asignados);
+    }
+
+    private void limpiarFiltros() {
+        filtroPrioridad = "Todas";
+        filtroEstado = "Todos";
+        filtroCategoria = "Todas";
+        filtroTecnico = "Todos";
+
+        spFilterPriorityAdmin.setSelection(0);
+        spFilterStatusAdmin.setSelection(0);
+        spFilterCategoryAdmin.setSelection(0);
+        spFilterTechnicianAdmin.setSelection(0);
+
+        aplicarFiltros();
     }
 
     private void removerListeners() {

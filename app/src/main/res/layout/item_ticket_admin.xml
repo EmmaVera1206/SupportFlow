@@ -15,7 +15,6 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <!-- Fila superior: título y categoría -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,38 +30,52 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvCategoria"
+                android:id="@+id/tvFecha"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Categoría: Soporte Técnico"
+                android:text="23/02/2026"
                 android:textColor="#888888"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
-        <!-- Descripción -->
         <TextView
             android:id="@+id/tvDescripcion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:text="Descripción del ticket"
             android:textColor="#555555"
             android:textSize="11sp" />
 
-        <!-- Fila inferior: botones y fecha -->
+        <TextView
+            android:id="@+id/tvCategoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Categoría: Soporte Técnico"
+            android:textColor="#666666"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tvPrioridad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Prioridad: HIGH"
+            android:textColor="#666666"
+            android:textSize="11sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnDetalles"
                 android:layout_width="wrap_content"
-                android:layout_height="28dp"
+                android:layout_height="36dp"
                 android:backgroundTint="#3F51B5"
-                android:paddingHorizontal="10dp"
                 android:text="Detalles"
                 android:textColor="#FFFFFF"
                 android:textSize="10sp" />
@@ -70,22 +83,21 @@
             <Button
                 android:id="@+id/btnAsignar"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="36dp"
                 android:layout_marginStart="6dp"
                 android:backgroundTint="#FF5722"
-                android:paddingHorizontal="10dp"
                 android:text="Asignar Técnico"
                 android:textColor="#FFFFFF"
                 android:textSize="10sp" />
 
-            <TextView
-                android:id="@+id/tvFecha"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="23/02/2026"
-                android:textColor="#888888"
+            <Button
+                android:id="@+id/btnEliminar"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="6dp"
+                android:backgroundTint="#D32F2F"
+                android:text="Eliminar"
+                android:textColor="#FFFFFF"
                 android:textSize="10sp" />
         </LinearLayout>
 
