@@ -28,6 +28,7 @@ import org.example.supportflow.R;
 import org.example.supportflow.data.TicketRepository;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,11 @@ public class CrearTicketActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
-                if (isGranted) takePictureLauncher.launch(null);
+                if (isGranted) {
+                    takePictureLauncher.launch(null);
+                } else {
+                    Toast.makeText(this, "Permiso de cámara necesario", Toast.LENGTH_SHORT).show();
+                }
             }
     );
 
@@ -59,19 +64,37 @@ public class CrearTicketActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crear_ticket);
 
-        // --- INICIALIZACIÓN DE CLOUDINARY ---
         try {
             Map<String, Object> config = new HashMap<>();
             config.put("cloud_name", "divqqxy4r");
             config.put("secure", true);
-            MediaManager.init(this, config);
-        } catch (Exception e) { /* Ya inicializado */ }
+            MediaManager.init(getApplicationContext(), config);
+        } catch (Exception e) {
+            // Ya inicializado
+        }
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) { finish(); return; }
+        if (user == null) {
+            Toast.makeText(this, "Sesión no válida.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         String uid = user.getUid();
 
-        // --- REFERENCIAS DE UI ---
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String name = doc.getString("name");
+                        if (name != null && !name.trim().isEmpty()) {
+                            currentUserName = name.trim();
+                        }
+                    }
+                });
+
         EditText etTitle = findViewById(R.id.etTitle);
         EditText etDesc = findViewById(R.id.etDescription);
         Spinner spCategory = findViewById(R.id.spCategory);
@@ -79,17 +102,17 @@ public class CrearTicketActivity extends AppCompatActivity {
         Button btnCrear = findViewById(R.id.btnCrear);
         ImageButton btnTomarFoto = findViewById(R.id.btn_tomar_foto);
 
-
         ArrayAdapter<CharSequence> adapterCat = ArrayAdapter.createFromResource(
-                this, R.array.ticket_categories, android.R.layout.simple_spinner_item);
+                this, R.array.ticket_categories, android.R.layout.simple_spinner_item
+        );
         adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spCategory.setAdapter(adapterCat);
 
         ArrayAdapter<CharSequence> adapterPri = ArrayAdapter.createFromResource(
-                this, R.array.ticket_priorities, android.R.layout.simple_spinner_item);
+                this, R.array.ticket_priorities, android.R.layout.simple_spinner_item
+        );
         adapterPri.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPriority.setAdapter(adapterPri);
-
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
@@ -104,11 +127,11 @@ public class CrearTicketActivity extends AppCompatActivity {
         btnCrear.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String desc = etDesc.getText().toString().trim();
-            String cat = spCategory.getSelectedItem() != null ? spCategory.getSelectedItem().toString() : "";
-            String pri = spPriority.getSelectedItem() != null ? spPriority.getSelectedItem().toString().toUpperCase() : "";
+            String cat = spCategory.getSelectedItem() != null ? spCategory.getSelectedItem().toString().trim() : "";
+            String pri = spPriority.getSelectedItem() != null ? spPriority.getSelectedItem().toString().trim().toUpperCase() : "";
 
-            if (title.isEmpty() || desc.isEmpty()) {
-                Toast.makeText(this, "Por favor llena los campos", Toast.LENGTH_SHORT).show();
+            if (title.isEmpty() || desc.isEmpty() || cat.isEmpty() || pri.isEmpty()) {
+                Toast.makeText(this, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -119,30 +142,42 @@ public class CrearTicketActivity extends AppCompatActivity {
                 imagenCapturada.compress(Bitmap.CompressFormat.JPEG, 90, baos);
                 byte[] data = baos.toByteArray();
 
-                Map<String, Object> options = new HashMap<>();
-                options.put("cloud_name", "divqqxy4r");
-                options.put("upload_preset", "ticket_final");
-
                 MediaManager.get().upload(data)
-                        .options(options)
+                        .unsigned("ticket_final")
                         .callback(new UploadCallback() {
-                            @Override public void onStart(String requestId) {}
-                            @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
+                            @Override
+                            public void onStart(String requestId) {
+                            }
+
+                            @Override
+                            public void onProgress(String requestId, long bytes, long totalBytes) {
+                            }
 
                             @Override
                             public void onSuccess(String requestId, Map resultData) {
-                                String url = (String) resultData.get("secure_url");
+                                String url = resultData.get("secure_url") != null
+                                        ? resultData.get("secure_url").toString()
+                                        : "";
+
                                 enviarTicketAFirestore(title, desc, cat, pri, uid, url);
                             }
 
                             @Override
                             public void onError(String requestId, ErrorInfo error) {
                                 btnCrear.setEnabled(true);
-                                Toast.makeText(CrearTicketActivity.this, "Error Cloudinary: " + error.getDescription(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(
+                                        CrearTicketActivity.this,
+                                        "Error Cloudinary: " + error.getDescription(),
+                                        Toast.LENGTH_LONG
+                                ).show();
                             }
 
-                            @Override public void onReschedule(String requestId, ErrorInfo error) {}
-                        }).dispatch();
+                            @Override
+                            public void onReschedule(String requestId, ErrorInfo error) {
+                            }
+                        })
+                        .dispatch();
+
             } else {
                 enviarTicketAFirestore(title, desc, cat, pri, uid, "");
             }
@@ -154,8 +189,10 @@ public class CrearTicketActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 Toast.makeText(CrearTicketActivity.this, "Ticket creado ✅", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
                 finish();
             }
+
             @Override
             public void onError(Exception e) {
                 findViewById(R.id.btnCrear).setEnabled(true);
