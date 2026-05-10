@@ -19,14 +19,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
+
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 
 import org.example.supportflow.R;
 import org.example.supportflow.data.TicketRepository;
 
 import java.io.ByteArrayOutputStream;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CrearTicketActivity extends AppCompatActivity {
 
@@ -39,8 +42,7 @@ public class CrearTicketActivity extends AppCompatActivity {
             bitmap -> {
                 if (bitmap != null) {
                     imagenCapturada = bitmap;
-                    ImageView ivPreview = findViewById(R.id.iv_preview);
-                    ivPreview.setImageBitmap(bitmap);
+                    ((ImageView) findViewById(R.id.iv_preview)).setImageBitmap(bitmap);
                 }
             }
     );
@@ -48,11 +50,7 @@ public class CrearTicketActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestPermission(),
             isGranted -> {
-                if (isGranted) {
-                    takePictureLauncher.launch(null);
-                } else {
-                    Toast.makeText(this, "Permiso de cámara necesario para adjuntar foto", Toast.LENGTH_SHORT).show();
-                }
+                if (isGranted) takePictureLauncher.launch(null);
             }
     );
 
@@ -61,27 +59,19 @@ public class CrearTicketActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crear_ticket);
 
+        // --- INICIALIZACIÓN DE CLOUDINARY ---
+        try {
+            Map<String, Object> config = new HashMap<>();
+            config.put("cloud_name", "divqqxy4r");
+            config.put("secure", true);
+            MediaManager.init(this, config);
+        } catch (Exception e) { /* Ya inicializado */ }
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, "Sesión no válida.", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
+        if (user == null) { finish(); return; }
         String uid = user.getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        String name = doc.getString("name");
-                        if (name != null && !name.trim().isEmpty()) {
-                            currentUserName = name.trim();
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> currentUserName = "Usuario");
-
+        // --- REFERENCIAS DE UI ---
         EditText etTitle = findViewById(R.id.etTitle);
         EditText etDesc = findViewById(R.id.etDescription);
         Spinner spCategory = findViewById(R.id.spCategory);
@@ -89,21 +79,17 @@ public class CrearTicketActivity extends AppCompatActivity {
         Button btnCrear = findViewById(R.id.btnCrear);
         ImageButton btnTomarFoto = findViewById(R.id.btn_tomar_foto);
 
-        ArrayAdapter<CharSequence> categoryAdapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.ticket_categories,
-                android.R.layout.simple_spinner_item
-        );
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spCategory.setAdapter(categoryAdapter);
 
-        ArrayAdapter<CharSequence> priorityAdapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.ticket_priorities,
-                android.R.layout.simple_spinner_item
-        );
-        priorityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spPriority.setAdapter(priorityAdapter);
+        ArrayAdapter<CharSequence> adapterCat = ArrayAdapter.createFromResource(
+                this, R.array.ticket_categories, android.R.layout.simple_spinner_item);
+        adapterCat.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spCategory.setAdapter(adapterCat);
+
+        ArrayAdapter<CharSequence> adapterPri = ArrayAdapter.createFromResource(
+                this, R.array.ticket_priorities, android.R.layout.simple_spinner_item);
+        adapterPri.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spPriority.setAdapter(adapterPri);
+
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
@@ -118,15 +104,11 @@ public class CrearTicketActivity extends AppCompatActivity {
         btnCrear.setOnClickListener(v -> {
             String title = etTitle.getText().toString().trim();
             String desc = etDesc.getText().toString().trim();
-            String cat = spCategory.getSelectedItem() != null
-                    ? spCategory.getSelectedItem().toString().trim()
-                    : "";
-            String pri = spPriority.getSelectedItem() != null
-                    ? spPriority.getSelectedItem().toString().trim().toUpperCase()
-                    : "";
+            String cat = spCategory.getSelectedItem() != null ? spCategory.getSelectedItem().toString() : "";
+            String pri = spPriority.getSelectedItem() != null ? spPriority.getSelectedItem().toString().toUpperCase() : "";
 
-            if (title.isEmpty() || desc.isEmpty() || cat.isEmpty() || pri.isEmpty()) {
-                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
+            if (title.isEmpty() || desc.isEmpty()) {
+                Toast.makeText(this, "Por favor llena los campos", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -134,71 +116,50 @@ public class CrearTicketActivity extends AppCompatActivity {
 
             if (imagenCapturada != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                imagenCapturada.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                imagenCapturada.compress(Bitmap.CompressFormat.JPEG, 90, baos);
                 byte[] data = baos.toByteArray();
 
-                StorageReference storageRef = FirebaseStorage.getInstance()
-                        .getReference()
-                        .child("tickets/" + UUID.randomUUID() + ".jpg");
+                Map<String, Object> options = new HashMap<>();
+                options.put("cloud_name", "divqqxy4r");
+                options.put("upload_preset", "ticket_final");
 
-                storageRef.putBytes(data)
-                        .addOnSuccessListener(taskSnapshot ->
-                                storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                    String downloadUrl = uri.toString();
-                                    repo.crearTicket(
-                                            title,
-                                            desc,
-                                            cat,
-                                            pri,
-                                            uid,
-                                            currentUserName,
-                                            downloadUrl,
-                                            new TicketRepository.SimpleCallback() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    Toast.makeText(CrearTicketActivity.this, "Ticket creado con foto ✅", Toast.LENGTH_SHORT).show();
-                                                    setResult(RESULT_OK);
-                                                    finish();
-                                                }
+                MediaManager.get().upload(data)
+                        .options(options)
+                        .callback(new UploadCallback() {
+                            @Override public void onStart(String requestId) {}
+                            @Override public void onProgress(String requestId, long bytes, long totalBytes) {}
 
-                                                @Override
-                                                public void onError(Exception e) {
-                                                    btnCrear.setEnabled(true);
-                                                    Toast.makeText(CrearTicketActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                    );
-                                })
-                        )
-                        .addOnFailureListener(e -> {
-                            btnCrear.setEnabled(true);
-                            Toast.makeText(this, "Error al subir foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
-
-            } else {
-                repo.crearTicket(
-                        title,
-                        desc,
-                        cat,
-                        pri,
-                        uid,
-                        currentUserName,
-                        "",
-                        new TicketRepository.SimpleCallback() {
                             @Override
-                            public void onSuccess() {
-                                Toast.makeText(CrearTicketActivity.this, "Ticket creado sin foto ✅", Toast.LENGTH_SHORT).show();
-                                setResult(RESULT_OK);
-                                finish();
+                            public void onSuccess(String requestId, Map resultData) {
+                                String url = (String) resultData.get("secure_url");
+                                enviarTicketAFirestore(title, desc, cat, pri, uid, url);
                             }
 
                             @Override
-                            public void onError(Exception e) {
+                            public void onError(String requestId, ErrorInfo error) {
                                 btnCrear.setEnabled(true);
-                                Toast.makeText(CrearTicketActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CrearTicketActivity.this, "Error Cloudinary: " + error.getDescription(), Toast.LENGTH_LONG).show();
                             }
-                        }
-                );
+
+                            @Override public void onReschedule(String requestId, ErrorInfo error) {}
+                        }).dispatch();
+            } else {
+                enviarTicketAFirestore(title, desc, cat, pri, uid, "");
+            }
+        });
+    }
+
+    private void enviarTicketAFirestore(String title, String desc, String cat, String pri, String uid, String url) {
+        repo.crearTicket(title, desc, cat, pri, uid, currentUserName, url, new TicketRepository.SimpleCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(CrearTicketActivity.this, "Ticket creado ✅", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            @Override
+            public void onError(Exception e) {
+                findViewById(R.id.btnCrear).setEnabled(true);
+                Toast.makeText(CrearTicketActivity.this, "Falla en DB: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
