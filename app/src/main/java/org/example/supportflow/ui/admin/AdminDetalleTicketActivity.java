@@ -1,10 +1,13 @@
 package org.example.supportflow.ui.admin;
 
 import android.os.Bundle;
+import android.view.View; // Necesario para View.VISIBLE/GONE
+import android.widget.ImageView; // Necesario para la imagen
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide; // Librería para cargar la URL de Cloudinary
 import org.example.supportflow.R;
 
 import java.text.SimpleDateFormat;
@@ -22,6 +25,8 @@ public class AdminDetalleTicketActivity extends AppCompatActivity {
     public static final String EXTRA_ASSIGNED_TO = "assignedTo";
     public static final String EXTRA_ASSIGNED_TO_NAME = "assignedToName";
     public static final String EXTRA_CREATED_AT = "createdAt";
+    // 1. Agregamos la constante para la URL de la imagen
+    public static final String EXTRA_IMAGE_URL = "image_url";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +35,18 @@ public class AdminDetalleTicketActivity extends AppCompatActivity {
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
+        // 2. Recuperamos la URL del Intent
         String title = getIntent().getStringExtra(EXTRA_TITLE);
         String description = getIntent().getStringExtra(EXTRA_DESCRIPTION);
         String category = getIntent().getStringExtra(EXTRA_CATEGORY);
         String priority = getIntent().getStringExtra(EXTRA_PRIORITY);
         String status = getIntent().getStringExtra(EXTRA_STATUS);
         String assignedToName = getIntent().getStringExtra(EXTRA_ASSIGNED_TO_NAME);
+        String imageUrl = getIntent().getStringExtra(EXTRA_IMAGE_URL); // Recuperamos la URL
         long createdAt = getIntent().getLongExtra(EXTRA_CREATED_AT, 0);
+
+        // Referencia al ImageView (asegúrate de haberlo agregado al XML como te puse antes)
+        ImageView ivEvidencia = findViewById(R.id.ivEvidencia);
 
         ((TextView) findViewById(R.id.tvTitulo)).setText(title != null ? title : "-");
         ((TextView) findViewById(R.id.tvDescripcion)).setText(description != null ? description : "-");
@@ -51,5 +61,15 @@ public class AdminDetalleTicketActivity extends AppCompatActivity {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         ((TextView) findViewById(R.id.tvFecha)).setText("Fecha: " + sdf.format(new Date(createdAt)));
+
+        // 3. Lógica para mostrar la imagen con Glide
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            ivEvidencia.setVisibility(View.VISIBLE);
+            Glide.with(this)
+                    .load(imageUrl)
+                    .into(ivEvidencia);
+        } else {
+            ivEvidencia.setVisibility(View.GONE);
+        }
     }
 }

@@ -1,22 +1,25 @@
 package org.example.supportflow.model;
 
 public class Ticket {
-    public String id;
-    public String title;
-    public String description;
-    public String category;
-    public String priority;
-    public String status;
-    public long createdAt;
-    public String createdBy;
-    public String createdByName;
-    public String assignedTo;
-    public String assignedToName;
-    public Long closedAt;
-    public String imageUrl;
+    private String id;
+    private String title;
+    private String description;
+    private String category;
+    private String priority;
+    private String status;
+    private String assignedTo;
+    private String assignedToName;
+    private long createdAt;
 
-    public Ticket() {}
+    // ESTA VARIABLE ES LA MÁS IMPORTANTE:
+    // Debe llamarse exactamente igual que en Firebase (imageUrl)
+    private String imageUrl;
 
+    public Ticket() {
+        // Constructor vacío necesario para Firebase
+    }
+
+    // Getters y Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -35,24 +38,21 @@ public class Ticket {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public long getCreatedAt() { return createdAt; }
-    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
-
-    public String getCreatedBy() { return createdBy; }
-    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
-
-    public String getCreatedByName() { return createdByName; }
-    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
-
     public String getAssignedTo() { return assignedTo; }
     public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
 
     public String getAssignedToName() { return assignedToName; }
     public void setAssignedToName(String assignedToName) { this.assignedToName = assignedToName; }
 
-    public Long getClosedAt() { return closedAt; }
-    public void setClosedAt(Long closedAt) { this.closedAt = closedAt; }
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    // GETTER Y SETTER PARA LA IMAGEN
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

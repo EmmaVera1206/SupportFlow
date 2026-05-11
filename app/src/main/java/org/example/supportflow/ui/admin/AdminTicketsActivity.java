@@ -218,6 +218,7 @@ public class AdminTicketsActivity extends AppCompatActivity {
         });
     }
 
+    // MÉTODO MODIFICADO PARA INCLUIR LA IMAGEN
     private void abrirDetalle(Ticket ticket) {
         Intent i = new Intent(this, AdminDetalleTicketActivity.class);
         i.putExtra(AdminDetalleTicketActivity.EXTRA_TICKET_ID, ticket.getId());
@@ -229,6 +230,10 @@ public class AdminTicketsActivity extends AppCompatActivity {
         i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO, ticket.getAssignedTo());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO_NAME, ticket.getAssignedToName());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_CREATED_AT, ticket.getCreatedAt());
+
+        // Esta es la línea clave que envía la URL de Cloudinary a la siguiente pantalla
+        i.putExtra(AdminDetalleTicketActivity.EXTRA_IMAGE_URL, ticket.getImageUrl());
+
         startActivity(i);
     }
 

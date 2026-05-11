@@ -41,9 +41,12 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage:20.3.0")
+
+    // Solo estas dos para Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
     implementation("com.cloudinary:cloudinary-android:3.0.2")
-// O la versión más reciente
 
     // ✅ Librería de gráficas
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
@@ -51,6 +54,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
     // CameraX core library
     val camerax_version = "1.3.0"
     implementation("androidx.camera:camera-core:$camerax_version")
