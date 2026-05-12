@@ -100,13 +100,15 @@
                         android:lineSpacingExtra="4dp"/>
 
                     <ImageView
-                        android:id="@+id/ivEvidence"
+                        android:id="@+id/ivEvidenceTecnico"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_height="220dp"
+                        android:layout_marginTop="12dp"
                         android:scaleType="centerCrop"
+                        android:background="#F0F0F0"
                         android:visibility="gone"
                         android:contentDescription="Evidencia del ticket"/>
+
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -195,7 +197,7 @@
                         android:hint="Añadir nota técnica..."
                         android:minLines="3"
                         android:padding="12dp"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#050505FF"
                         android:textColorHint="#666666"/>
 
                     <Button

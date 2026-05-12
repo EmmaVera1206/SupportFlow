@@ -45,7 +45,7 @@ public class AdminDetalleTicketActivity extends AppCompatActivity {
         String imageUrl = getIntent().getStringExtra(EXTRA_IMAGE_URL); // Recuperamos la URL
         long createdAt = getIntent().getLongExtra(EXTRA_CREATED_AT, 0);
 
-        // Referencia al ImageView (asegúrate de haberlo agregado al XML como te puse antes)
+        // Referencia al ImageView
         ImageView ivEvidencia = findViewById(R.id.ivEvidencia);
 
         ((TextView) findViewById(R.id.tvTitulo)).setText(title != null ? title : "-");

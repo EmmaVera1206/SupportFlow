@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -61,8 +62,8 @@ class TecnicoDetalleActivity : AppCompatActivity() {
         val btnResuelto = findViewById<Button>(R.id.btnMarcarResuelto)
         val btnSendComment = findViewById<Button>(R.id.btnSendComment)
         val etComment = findViewById<EditText>(R.id.etComment)
+        val ivEvidence = findViewById<ImageView>(R.id.ivEvidenceTecnico)
 
-        // Setup RecyclerView comentarios
         val rvComments = findViewById<RecyclerView>(R.id.rvComments)
         rvComments.layoutManager = LinearLayoutManager(this)
         commentAdapter = CommentAdapter()
@@ -75,7 +76,6 @@ class TecnicoDetalleActivity : AppCompatActivity() {
 
         findViewById<View>(R.id.btnBackTecnicoDetalle).setOnClickListener { finish() }
 
-        // Escuchar ticket
         ticketListener = db.collection("tickets").document(ticketId)
             .addSnapshotListener { doc, e ->
                 if (e != null) {
@@ -88,6 +88,17 @@ class TecnicoDetalleActivity : AppCompatActivity() {
                     if (t != null) {
                         tvTitle.text = t.title
                         tvDesc.text = t.description ?: ""
+
+                        if (!t.imageUrl.isNullOrBlank()) {
+                            ivEvidence.visibility = View.VISIBLE
+                            Glide.with(this)
+                                .load(t.imageUrl)
+                                .placeholder(R.drawable.ic_launcher_foreground)
+                                .error(R.drawable.ic_launcher_foreground)
+                                .into(ivEvidence)
+                        } else {
+                            ivEvidence.visibility = View.GONE
+                        }
 
                         val estadoActual = t.status ?: "OPEN"
                         ultimoEstadoCargado = estadoActual
@@ -103,7 +114,6 @@ class TecnicoDetalleActivity : AppCompatActivity() {
                 }
             }
 
-        // Escuchar comentarios
         commentsListener = db.collection("tickets").document(ticketId)
             .collection("comments")
             .orderBy("createdAt", Query.Direction.ASCENDING)

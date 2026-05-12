@@ -11,12 +11,11 @@ public class Ticket {
     private String assignedToName;
     private long createdAt;
 
-    // ESTA VARIABLE ES LA MÁS IMPORTANTE:
-    // Debe llamarse exactamente igual que en Firebase (imageUrl)
+
     private String imageUrl;
 
     public Ticket() {
-        // Constructor vacío necesario para Firebase
+        // Constructor vacío para Firebase
     }
 
     // Getters y Setters

@@ -8,6 +8,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,6 +58,8 @@ public class DetalleTicketActivity extends AppCompatActivity {
         }
 
         String uid = user.getUid();
+        LinearLayout layoutUserActions = findViewById(R.id.layoutUserActions);
+        Button btnEliminarTicket = findViewById(R.id.btnEliminarTicket);
 
         ticketId = getIntent().getStringExtra("TICKET_ID");
         if (ticketId == null || ticketId.isEmpty()) {
@@ -119,6 +123,27 @@ public class DetalleTicketActivity extends AppCompatActivity {
                                     ? t.getAssignedToName()
                                     : "Sin asignar";
                             tvAssigned.setText("Técnico asignado: " + assignedName);
+                            boolean noAsignado = t.getAssignedTo() == null || t.getAssignedTo().trim().isEmpty();
+                            layoutUserActions.setVisibility(noAsignado ? View.VISIBLE : View.GONE);
+
+                            btnEliminarTicket.setOnClickListener(v -> {
+                                new AlertDialog.Builder(DetalleTicketActivity.this)
+                                        .setTitle("Eliminar ticket")
+                                        .setMessage("¿Seguro que deseas eliminar este ticket?")
+                                        .setPositiveButton("Eliminar", (dialog, which) -> {
+                                            db.collection("tickets")
+                                                    .document(ticketId)
+                                                    .delete()
+                                                    .addOnSuccessListener(unused -> {
+                                                        Toast.makeText(DetalleTicketActivity.this, "Ticket eliminado ✅", Toast.LENGTH_SHORT).show();
+                                                        finish();
+                                                    })
+                                                    .addOnFailureListener(err ->
+                                                            Toast.makeText(DetalleTicketActivity.this, "Error eliminando: " + err.getMessage(), Toast.LENGTH_SHORT).show());
+                                        })
+                                        .setNegativeButton("Cancelar", null)
+                                        .show();
+                            });
 
                             if (t.getImageUrl() != null && !t.getImageUrl().isEmpty()) {
                                 ivEvidence.setVisibility(View.VISIBLE);

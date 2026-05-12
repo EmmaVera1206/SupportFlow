@@ -129,4 +129,28 @@ public class TicketRepository {
                     cb.onSuccess(list);
                 });
     }
+
+    public void actualizarTicket(String ticketId, String title, String description, String category, String priority, String imageUrl, SimpleCallback cb) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("title", title);
+        updates.put("description", description);
+        updates.put("category", category);
+        updates.put("priority", priority);
+        updates.put("imageUrl", imageUrl);
+
+        db.collection("tickets")
+                .document(ticketId)
+                .update(updates)
+                .addOnSuccessListener(unused -> cb.onSuccess())
+                .addOnFailureListener(cb::onError);
+    }
+
+    public void eliminarTicket(String ticketId, SimpleCallback cb) {
+        db.collection("tickets")
+                .document(ticketId)
+                .delete()
+                .addOnSuccessListener(unused -> cb.onSuccess())
+                .addOnFailureListener(cb::onError);
+    }
+
 }
