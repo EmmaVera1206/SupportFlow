@@ -59,5 +59,10 @@
         <activity
             android:name=".ui.admin.AdminDetalleTicketActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.admin.AdminUsuariosActivity"
+            android:exported="false" />
+
     </application>
 </manifest>

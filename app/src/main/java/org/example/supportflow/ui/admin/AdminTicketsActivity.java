@@ -128,6 +128,10 @@ public class AdminTicketsActivity extends AppCompatActivity {
                 startActivity(new Intent(AdminTicketsActivity.this, AdminReportesActivity.class))
         );
 
+        findViewById(R.id.btnUsuariosAdmin).setOnClickListener(v ->
+                startActivity(new Intent(AdminTicketsActivity.this, AdminUsuariosActivity.class))
+        );
+
         findViewById(R.id.btnClearFiltersAdmin).setOnClickListener(v -> limpiarFiltros());
 
         findViewById(R.id.btnCerrarSesion).setOnClickListener(v -> hacerLogoutSeguro());
