@@ -5,10 +5,15 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import org.example.supportflow.R
+import org.example.supportflow.adapter.CommentAdapter
+import org.example.supportflow.model.Comment
 import org.example.supportflow.model.Ticket
 import org.example.supportflow.ui.auth.LoginActivity
 
@@ -17,10 +22,13 @@ class TecnicoDetalleActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private lateinit var ticketId: String
     private var ticketListener: ListenerRegistration? = null
+    private var commentsListener: ListenerRegistration? = null
 
     private var cargandoEstadoInicial = true
     private var ultimoEstadoCargado: String? = null
     private var currentUserName: String = "Técnico"
+
+    private lateinit var commentAdapter: CommentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,22 +57,25 @@ class TecnicoDetalleActivity : AppCompatActivity() {
 
         val tvTitle = findViewById<TextView>(R.id.tvTitle)
         val tvDesc = findViewById<TextView>(R.id.tvDesc)
-
         val spinnerEstado = findViewById<Spinner>(R.id.spEstadoTicket)
+        val btnResuelto = findViewById<Button>(R.id.btnMarcarResuelto)
+        val btnSendComment = findViewById<Button>(R.id.btnSendComment)
+        val etComment = findViewById<EditText>(R.id.etComment)
+
+        // Setup RecyclerView comentarios
+        val rvComments = findViewById<RecyclerView>(R.id.rvComments)
+        rvComments.layoutManager = LinearLayoutManager(this)
+        commentAdapter = CommentAdapter()
+        rvComments.adapter = commentAdapter
+
         val opciones = arrayOf("OPEN", "IN_PROGRESS", "RESOLVED")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, opciones)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerEstado.adapter = spinnerAdapter
 
-        val btnResuelto = findViewById<Button>(R.id.btnMarcarResuelto)
-        val btnSendComment = findViewById<Button>(R.id.btnSendComment)
-        val etComment = findViewById<EditText>(R.id.etComment)
-
         findViewById<View>(R.id.btnBackTecnicoDetalle).setOnClickListener { finish() }
 
-        val btnLogout = findViewById<Button?>(R.id.btnLogout)
-        btnLogout?.setOnClickListener { hacerLogoutSeguro() }
-
+        // Escuchar ticket
         ticketListener = db.collection("tickets").document(ticketId)
             .addSnapshotListener { doc, e ->
                 if (e != null) {
@@ -92,6 +103,27 @@ class TecnicoDetalleActivity : AppCompatActivity() {
                 }
             }
 
+        // Escuchar comentarios
+        commentsListener = db.collection("tickets").document(ticketId)
+            .collection("comments")
+            .orderBy("createdAt", Query.Direction.ASCENDING)
+            .addSnapshotListener { snap, e ->
+                if (e != null) {
+                    Toast.makeText(this, "Error leyendo comentarios", Toast.LENGTH_SHORT).show()
+                    return@addSnapshotListener
+                }
+
+                val list = mutableListOf<Comment>()
+                snap?.documents?.forEach { d ->
+                    val c = d.toObject(Comment::class.java)
+                    if (c != null) {
+                        c.id = d.id
+                        list.add(c)
+                    }
+                }
+                commentAdapter.submit(list)
+            }
+
         spinnerEstado.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val nuevoEstado = opciones[position]
@@ -101,29 +133,18 @@ class TecnicoDetalleActivity : AppCompatActivity() {
                     return
                 }
 
-                if (nuevoEstado == ultimoEstadoCargado) {
-                    return
-                }
+                if (nuevoEstado == ultimoEstadoCargado) return
 
-                val update = hashMapOf<String, Any>(
-                    "status" to nuevoEstado
-                )
-
+                val update = hashMapOf<String, Any>("status" to nuevoEstado)
                 if (nuevoEstado == "RESOLVED") {
                     update["closedAt"] = System.currentTimeMillis()
                 }
 
                 db.collection("tickets").document(ticketId)
                     .update(update)
-                    .addOnSuccessListener {
-                        ultimoEstadoCargado = nuevoEstado
-                    }
+                    .addOnSuccessListener { ultimoEstadoCargado = nuevoEstado }
                     .addOnFailureListener { err ->
-                        Toast.makeText(
-                            this@TecnicoDetalleActivity,
-                            "Error actualizando: ${err.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@TecnicoDetalleActivity, "Error: ${err.message}", Toast.LENGTH_SHORT).show()
                     }
             }
 
@@ -165,6 +186,8 @@ class TecnicoDetalleActivity : AppCompatActivity() {
     private fun removerListeners() {
         ticketListener?.remove()
         ticketListener = null
+        commentsListener?.remove()
+        commentsListener = null
     }
 
     private fun hacerLogoutSeguro() {

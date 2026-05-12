@@ -5,13 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#1A1A2E">
+    android:background="#F4F6FB">
 
     <!-- Toolbar -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:paddingHorizontal="12dp">
+        android:layout_height="60dp"
+        android:background="#1A237E"
+        android:paddingHorizontal="12dp"
+        android:elevation="6dp">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -27,13 +29,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Detalle Ticket"
+            android:text="Detalle del Ticket"
             android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold"/>
     </RelativeLayout>
 
-    <ScrollView
+    <!-- Contenido con NestedScrollView -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -42,105 +45,142 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="18dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
+            <!-- Card info del ticket -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#F2F2F2"
-                android:padding="18dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="16dp">
 
-                <TextView
-                    android:id="@+id/tvTitle"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Título del ticket"
-                    android:textColor="#111111"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:gravity="center"/>
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/tvDesc"
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Título del ticket"
+                        android:textColor="#1A237E"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0"/>
+
+                    <TextView
+                        android:id="@+id/tvDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Descripción..."
+                        android:textColor="#444444"
+                        android:textSize="15sp"
+                        android:lineSpacingExtra="4dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E0E0E0"/>
+
+                    <TextView
+                        android:id="@+id/tvMeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Categoría / Prioridad / Estado"
+                        android:textColor="#555555"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tvAssigned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Técnico asignado: -"
+                        android:textColor="#1A237E"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                    <ImageView
+                        android:id="@+id/ivEvidence"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="16dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        android:contentDescription="Evidencia"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Card comentarios -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="18dp"
-                    android:text="Descripción del problema..."
-                    android:textColor="#666666"
-                    android:textSize="15sp"
-                    android:gravity="center"/>
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/tvMeta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Categoría / Prioridad / Estado"
-                    android:textColor="#111111"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Historial de comentarios"
+                        android:textColor="#1A237E"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
 
-                <TextView
-                    android:id="@+id/tvAssigned"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:text="Técnico asignado: -"
-                    android:textColor="#111111"
-                    android:textSize="16sp"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvComments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
 
-                <ImageView
-                    android:id="@+id/ivEvidence"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="16dp"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone"
-                    android:contentDescription="Evidencia"/>
+                    <EditText
+                        android:id="@+id/etComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:background="@android:drawable/edit_text"
+                        android:gravity="top|start"
+                        android:hint="Escribe un comentario..."
+                        android:minLines="3"
+                        android:padding="12dp"
+                        android:textColor="#111111"
+                        android:textColorHint="#999999"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="22dp"
-                    android:text="Comentarios"
-                    android:textColor="#111111"
-                    android:textSize="17sp"
-                    android:textStyle="bold"/>
+                    <Button
+                        android:id="@+id/btnSendComment"
+                        android:layout_width="160dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="14dp"
+                        android:backgroundTint="#1A237E"
+                        android:text="ENVIAR"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvComments"
-                    android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:layout_marginTop="8dp"
-                    android:nestedScrollingEnabled="false"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <EditText
-                    android:id="@+id/etComment"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@android:drawable/edit_text"
-                    android:gravity="top|start"
-                    android:hint="Escribe un comentario..."
-                    android:padding="12dp"
-                    android:textColor="#111111"
-                    android:textColorHint="#999999"/>
-
-                <Button
-                    android:id="@+id/btnSendComment"
-                    android:layout_width="150dp"
-                    android:layout_height="46dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="14dp"
-                    android:backgroundTint="#3F45B5"
-                    android:text="ENVIAR"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <TextView
         android:layout_width="match_parent"
@@ -150,4 +190,5 @@
         android:textSize="12sp"
         android:gravity="center"
         android:paddingVertical="8dp"/>
+
 </LinearLayout>
