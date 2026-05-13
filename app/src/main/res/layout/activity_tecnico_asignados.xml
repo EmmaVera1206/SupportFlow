@@ -44,128 +44,184 @@
             app:tint="#FFFFFF"/>
     </RelativeLayout>
 
-    <LinearLayout
+    <!-- Contenedor de Filtros con Scroll por si la pantalla es pequeña -->
+    <ScrollView
         android:id="@+id/layoutFiltrosTecnico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="12dp"
-        android:paddingBottom="8dp"
         android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filtrar por categoría"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="4dp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_spinner_profesional"
-            android:paddingHorizontal="12dp">
-
-            <Spinner
-                android:id="@+id/spFilterCategory"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:gravity="center_vertical" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float"
-                app:tint="#777777" />
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filtrar por estado"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="12dp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_spinner_profesional"
-            android:paddingHorizontal="12dp">
-
-            <Spinner
-                android:id="@+id/spFilterStatus"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:gravity="center_vertical" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float"
-                app:tint="#777777" />
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filtrar por prioridad"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="13sp"
-            android:layout_marginTop="12dp" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/bg_spinner_profesional"
-            android:paddingHorizontal="12dp">
-
-            <Spinner
-                android:id="@+id/spFilterPriority"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:gravity="center_vertical" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/arrow_down_float"
-                app:tint="#777777" />
-        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="12dp">
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp"
+            android:paddingBottom="8dp">
+
+            <!-- 1. Categoría -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar por categoría"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_spinner_profesional"
+                android:paddingHorizontal="12dp">
+                <Spinner
+                    android:id="@+id/spFilterCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#777777" />
+            </RelativeLayout>
+
+            <!-- 2. Estado -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar por estado"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_spinner_profesional"
+                android:paddingHorizontal="12dp">
+                <Spinner
+                    android:id="@+id/spFilterStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#777777" />
+            </RelativeLayout>
+
+            <!-- 3. Prioridad -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar por prioridad"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_spinner_profesional"
+                android:paddingHorizontal="12dp">
+                <Spinner
+                    android:id="@+id/spFilterPriority"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#777777" />
+            </RelativeLayout>
+
+
+
+            <!-- 5. Fecha (NUEVO) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar por tiempo"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_spinner_profesional"
+                android:paddingHorizontal="12dp">
+                <Spinner
+                    android:id="@+id/spFilterDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#777777" />
+            </RelativeLayout>
+
+            <!-- 6. Usuario (NUEVO) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filtrar por usuario"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:layout_marginTop="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_spinner_profesional"
+                android:paddingHorizontal="12dp">
+                <Spinner
+                    android:id="@+id/spFilterUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#777777" />
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/btnClearFiltersTecnico"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
                 android:text="Limpiar"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#616161" />
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/tvEmpty"
@@ -191,8 +247,7 @@
         android:layout_height="wrap_content"
         android:gravity="end"
         android:paddingHorizontal="12dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="4dp">
+        android:paddingVertical="8dp">
 
         <Button
             android:id="@+id/btnLogoutTecnico"

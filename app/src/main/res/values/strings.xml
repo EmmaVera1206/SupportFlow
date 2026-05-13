@@ -46,4 +46,12 @@
         <item>CRITICAL</item>
     </string-array>
 
+    <string-array name="filter_date_options">
+        <item>Cualquiera</item>
+        <item>Hoy</item>
+        <item>Semana</item>
+        <item>Mes</item>
+    </string-array>
+
+
 </resources>
