@@ -234,6 +234,7 @@ public class AdminTicketsActivity extends AppCompatActivity {
         i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO, ticket.getAssignedTo());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_ASSIGNED_TO_NAME, ticket.getAssignedToName());
         i.putExtra(AdminDetalleTicketActivity.EXTRA_CREATED_AT, ticket.getCreatedAt());
+        i.putExtra(AdminDetalleTicketActivity.EXTRA_CREATED_BY_NAME, ticket.getCreatedByName());
 
         // Esta es la línea clave que envía la URL de Cloudinary a la siguiente pantalla
         i.putExtra(AdminDetalleTicketActivity.EXTRA_IMAGE_URL, ticket.getImageUrl());

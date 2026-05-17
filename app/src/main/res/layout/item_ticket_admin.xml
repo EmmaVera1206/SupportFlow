@@ -65,6 +65,15 @@
             android:textColor="#666666"
             android:textSize="11sp" />
 
+        <TextView
+            android:id="@+id/tvCreadoPor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Creado por: Usuario"
+            android:textColor="#666666"
+            android:textSize="11sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

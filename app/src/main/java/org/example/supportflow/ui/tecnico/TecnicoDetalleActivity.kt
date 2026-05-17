@@ -58,6 +58,7 @@ class TecnicoDetalleActivity : AppCompatActivity() {
 
         val tvTitle = findViewById<TextView>(R.id.tvTitle)
         val tvDesc = findViewById<TextView>(R.id.tvDesc)
+        val tvCreadoPor = findViewById<TextView>(R.id.tvCreadoPorTecnico)
         val spinnerEstado = findViewById<Spinner>(R.id.spEstadoTicket)
         val btnResuelto = findViewById<Button>(R.id.btnMarcarResuelto)
         val btnSendComment = findViewById<Button>(R.id.btnSendComment)
@@ -88,6 +89,7 @@ class TecnicoDetalleActivity : AppCompatActivity() {
                     if (t != null) {
                         tvTitle.text = t.title
                         tvDesc.text = t.description ?: ""
+                        tvCreadoPor.text = "Creado por: ${t.createdByName ?: "-"}"
 
                         if (!t.imageUrl.isNullOrBlank()) {
                             ivEvidence.visibility = View.VISIBLE
@@ -198,12 +200,6 @@ class TecnicoDetalleActivity : AppCompatActivity() {
         ticketListener = null
         commentsListener?.remove()
         commentsListener = null
-    }
-
-    private fun hacerLogoutSeguro() {
-        removerListeners()
-        FirebaseAuth.getInstance().signOut()
-        irALogin()
     }
 
     private fun irALogin() {

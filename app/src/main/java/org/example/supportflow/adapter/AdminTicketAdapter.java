@@ -54,6 +54,7 @@ public class AdminTicketAdapter extends RecyclerView.Adapter<AdminTicketAdapter.
         holder.tvDescripcion.setText(valorSeguro(ticket.getDescription()));
         holder.tvCategoria.setText("Categoría: " + valorSeguro(ticket.getCategory()));
         holder.tvPrioridad.setText("Prioridad: " + valorSeguro(ticket.getPriority()));
+        holder.tvCreadoPor.setText("Creado por: " + valorSeguro(ticket.getCreatedByName()));
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         holder.tvFecha.setText(sdf.format(new Date(ticket.getCreatedAt())));
@@ -79,7 +80,7 @@ public class AdminTicketAdapter extends RecyclerView.Adapter<AdminTicketAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitulo, tvDescripcion, tvCategoria, tvPrioridad, tvFecha;
+        TextView tvTitulo, tvDescripcion, tvCategoria, tvPrioridad, tvCreadoPor, tvFecha;
         Button btnDetalles, btnAsignar, btnEliminar;
 
         public ViewHolder(@NonNull View itemView) {
@@ -88,6 +89,7 @@ public class AdminTicketAdapter extends RecyclerView.Adapter<AdminTicketAdapter.
             tvDescripcion = itemView.findViewById(R.id.tvDescripcion);
             tvCategoria = itemView.findViewById(R.id.tvCategoria);
             tvPrioridad = itemView.findViewById(R.id.tvPrioridad);
+            tvCreadoPor = itemView.findViewById(R.id.tvCreadoPor);
             tvFecha = itemView.findViewById(R.id.tvFecha);
             btnDetalles = itemView.findViewById(R.id.btnDetalles);
             btnAsignar = itemView.findViewById(R.id.btnAsignar);

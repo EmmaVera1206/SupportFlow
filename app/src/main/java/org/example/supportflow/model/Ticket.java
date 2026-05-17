@@ -7,18 +7,20 @@ public class Ticket {
     private String category;
     private String priority;
     private String status;
+
+    private String createdBy;
+    private String createdByName;
+
     private String assignedTo;
     private String assignedToName;
+
     private long createdAt;
-
-
     private String imageUrl;
 
     public Ticket() {
         // Constructor vacío para Firebase
     }
 
-    // Getters y Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -37,6 +39,12 @@ public class Ticket {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
+
+    public String getCreatedByName() { return createdByName; }
+    public void setCreatedByName(String createdByName) { this.createdByName = createdByName; }
+
     public String getAssignedTo() { return assignedTo; }
     public void setAssignedTo(String assignedTo) { this.assignedTo = assignedTo; }
 
@@ -46,12 +54,6 @@ public class Ticket {
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
 
-    // GETTER Y SETTER PARA LA IMAGEN
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
