@@ -91,6 +91,7 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
+
                 val list = mutableListOf<Ticket>()
                 snap?.documents?.forEach { doc ->
                     doc.toObject(Ticket::class.java)?.let {
@@ -98,7 +99,9 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
                         list.add(it)
                     }
                 }
+
                 todosLosTickets = list
+                cargarUsuariosDinamicosDesdeTickets()
                 aplicarFiltros()
             }
     }
@@ -108,22 +111,39 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
         vincularSpinner(spFilterStatus, R.array.ticket_filter_status_tecnico)
         vincularSpinner(spFilterPriority, R.array.ticket_filter_priorities_tecnico)
         vincularSpinner(spFilterDate, R.array.filter_date_options)
-        cargarUsuariosDinamicos()
+
+        val userAdapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            mutableListOf("Todos")
+        )
+        userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spFilterUser.adapter = userAdapter
     }
 
-    private fun cargarUsuariosDinamicos() {
-        db.collection("users")
-            .get()
-            .addOnSuccessListener { documents ->
-                val listaNombres = mutableListOf("Todos")
-                for (doc in documents) {
-                    val nombre = doc.getString("name")
-                    if (!nombre.isNullOrEmpty()) listaNombres.add(nombre)
-                }
-                val userAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listaNombres)
-                userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spFilterUser.adapter = userAdapter
+    private fun cargarUsuariosDinamicosDesdeTickets() {
+        val listaNombres = mutableListOf("Todos")
+
+        todosLosTickets.forEach { ticket ->
+            val nombreCreador = ticket.createdByName
+            if (!nombreCreador.isNullOrBlank() && !listaNombres.contains(nombreCreador)) {
+                listaNombres.add(nombreCreador)
             }
+        }
+
+        val seleccionActual = filtroUsuario
+
+        val userAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listaNombres)
+        userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spFilterUser.adapter = userAdapter
+
+        val index = listaNombres.indexOf(seleccionActual)
+        if (index >= 0) {
+            spFilterUser.setSelection(index)
+        } else {
+            spFilterUser.setSelection(0)
+            filtroUsuario = "Todos"
+        }
     }
 
     private fun vincularSpinner(spinner: Spinner, arrayRes: Int) {
@@ -134,7 +154,7 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
 
     private fun configurarEventosFiltros() {
         val listener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 filtroCategoria = spFilterCategory.selectedItem.toString()
                 filtroEstado = spFilterStatus.selectedItem.toString()
                 filtroPrioridad = spFilterPriority.selectedItem.toString()
@@ -142,7 +162,8 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
                 filtroUsuario = spFilterUser.selectedItem?.toString() ?: "Todos"
                 aplicarFiltros()
             }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
         spFilterCategory.onItemSelectedListener = listener
@@ -162,14 +183,14 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
             val matchesPri = filtroPrioridad == "Todas" || t.priority == filtroPrioridad
 
             val fechaTicket = t.createdAt
-            val matchesFecha = when(filtroFecha) {
+            val matchesFecha = when (filtroFecha) {
                 "Hoy" -> (ahora - fechaTicket) <= unDia
                 "Semana" -> (ahora - fechaTicket) <= (unDia * 7)
                 "Mes" -> (ahora - fechaTicket) <= (unDia * 30)
                 else -> true
             }
 
-            val matchesUser = filtroUsuario == "Todos" || t.assignedToName == filtroUsuario
+            val matchesUser = filtroUsuario == "Todos" || t.createdByName == filtroUsuario
 
             matchesCat && matchesEst && matchesPri && matchesFecha && matchesUser
         }
@@ -184,11 +205,21 @@ class TecnicoAsignadosActivity : AppCompatActivity() {
         spFilterPriority.setSelection(0)
         spFilterDate.setSelection(0)
         spFilterUser.setSelection(0)
+
+        filtroCategoria = "Todas"
+        filtroEstado = "Todos"
+        filtroPrioridad = "Todas"
+        filtroFecha = "Cualquiera"
+        filtroUsuario = "Todos"
+
         aplicarFiltros()
     }
 
     private fun irALogin() {
-        startActivity(Intent(this, LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        startActivity(
+            Intent(this, LoginActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        )
         finish()
     }
 

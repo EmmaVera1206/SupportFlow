@@ -98,6 +98,14 @@
                 android:textColor="#666666"
                 android:textSize="13sp"
                 android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/tvCreatedBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Creado por: Usuario"
+                android:textColor="#666666"
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/tvCategoryValue"

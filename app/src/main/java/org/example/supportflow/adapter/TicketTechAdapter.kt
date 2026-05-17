@@ -38,6 +38,8 @@ class TicketTechAdapter(
         holder.tvCategory.text = "Categoría:"
         holder.tvCategoryValue.text = valorSeguro(t.category)
 
+        holder.tvCreatedBy.text = "Creado por: ${valorSeguro(t.createdByName)}"
+
         holder.tvStatus.text = formatearEstado(t.status)
         holder.tvPriority.text = formatearPrioridad(t.priority)
 
@@ -103,6 +105,7 @@ class TicketTechAdapter(
         val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
         val tvCategory: TextView = itemView.findViewById(R.id.tvCategory)
         val tvCategoryValue: TextView = itemView.findViewById(R.id.tvCategoryValue)
+        val tvCreatedBy: TextView = itemView.findViewById(R.id.tvCreatedBy)
         val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
         val tvPriority: TextView = itemView.findViewById(R.id.tvPriority)
         val tvDate: TextView = itemView.findViewById(R.id.tvDate)
