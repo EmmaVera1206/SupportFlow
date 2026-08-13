@@ -1,8 +1,8 @@
-**SupportFlow**
+# SupportFlow
 Aplicación móvil Android desarrollada para la gestión de tickets de soporte técnico. Su objetivo es facilitar el registro, asignación, seguimiento y resolución de incidencias mediante un sistema organizado por roles. La aplicación permite que usuarios finales reporten problemas, que técnicos atiendan los tickets asignados y que administradores supervisen todo el flujo de soporte.
 
-**Funcionalidades principales**
-USER
+## Funcionalidades principales
+### USER
 -El usuario puede:
 -Registrarse e iniciar sesión.
 -Verificar su cuenta mediante correo electrónico.
@@ -16,7 +16,7 @@ USER
 -Enviar comentarios.
 -Eliminar tickets mientras no hayan sido asignados.
 
-TECH
+### TECH
 El técnico puede:
 -Consultar únicamente los tickets que le han sido asignados.
 -Visualizar el nombre del usuario que creó cada ticket.
@@ -27,7 +27,7 @@ El técnico puede:
 -Agregar comentarios técnicos.
 -Consultar el historial de comentarios.
 
-ADMIN
+### ADMIN
 El administrador cuenta con acceso a las funciones generales de gestión:
 -Visualizar todos los tickets.
 -Consultar el usuario creador de cada ticket.
@@ -40,20 +40,20 @@ El administrador cuenta con acceso a las funciones generales de gestión:
 -Administrar usuarios y roles.
 -Visualizar reportes gráficos del sistema.
 
-Estados de los tickets
+### Estados de los tickets
 Los tickets pueden encontrarse en los siguientes estados:
 -OPEN: ticket creado y pendiente de atención.
 -IN_PROGRESS: ticket actualmente en proceso.
 -RESOLVED: problema atendido y ticket resuelto.
 
-Prioridades
+### Prioridades
 El usuario puede indicar el nivel de prioridad de la incidencia:
 -LOW
 -MEDIUM
 -HIGH
 -CRITICAL
 
-**Tecnologías utilizadas**
+## Tecnologías utilizadas**
 El proyecto fue desarrollado utilizando:
 -Android Studio
 -Java
@@ -66,7 +66,7 @@ El proyecto fue desarrollado utilizando:
 -MPAndroidChart
 -Git
 
-**Objetivo del proyecto**
+## Objetivo del proyecto
 SupportFlow fue desarrollado con el propósito de implementar una solución móvil que permita administrar de manera estructurada el ciclo completo de atención de incidencias.
 
 El proyecto integra conceptos relacionados con:
