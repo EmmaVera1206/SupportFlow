@@ -3,7 +3,7 @@ Aplicación móvil Android desarrollada para la gestión de tickets de soporte t
 
 ## Funcionalidades principales
 ### USER
--El usuario puede:
+El usuario puede:
 -Registrarse e iniciar sesión.
 -Verificar su cuenta mediante correo electrónico.
 -Crear tickets de soporte.
@@ -53,7 +53,7 @@ El usuario puede indicar el nivel de prioridad de la incidencia:
 -HIGH
 -CRITICAL
 
-## Tecnologías utilizadas**
+## Tecnologías utilizadas
 El proyecto fue desarrollado utilizando:
 -Android Studio
 -Java
